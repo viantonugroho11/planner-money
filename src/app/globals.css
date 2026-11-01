@@ -4,25 +4,36 @@
 
 @layer base {
   :root {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 6%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 6%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 142 71% 45%;
-    --primary-foreground: 144 61% 20%;
-    --secondary: 240 4% 16%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 4% 14%;
-    --muted-foreground: 240 5% 65%;
-    --accent: 240 4% 16%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 63% 51%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 4% 16%;
-    --input: 240 4% 16%;
-    --ring: 142 71% 45%;
+    /* Deep navy base — distinct from generic #111 / #0B0B0B */
+    --background: 222 60% 5%;        /* #070C19 */
+    --foreground: 214 32% 91%;       /* #DDE5F0 */
+
+    --card: 222 55% 8%;              /* #0C1422 */
+    --card-foreground: 214 32% 91%;
+
+    --popover: 222 55% 10%;
+    --popover-foreground: 214 32% 91%;
+
+    /* Soft indigo accent — not the generic green */
+    --primary: 239 84% 67%;          /* #6366F1 */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 222 40% 13%;        /* #141F38 */
+    --secondary-foreground: 214 25% 75%;
+
+    --muted: 222 40% 11%;            /* #101A2E */
+    --muted-foreground: 220 18% 55%; /* #7E8FA8 */
+
+    --accent: 222 40% 16%;
+    --accent-foreground: 214 32% 91%;
+
+    --destructive: 0 72% 60%;        /* #F05252 */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 222 35% 18%;           /* #1D2D48 */
+    --input: 222 40% 13%;
+    --ring: 239 84% 67%;
+
     --radius: 0.75rem;
   }
 }
@@ -34,20 +45,35 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  h1, h2, h3 {
+    letter-spacing: -0.02em;
   }
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: hsl(var(--muted));
-}
-::-webkit-scrollbar-thumb {
-  background: hsl(var(--border));
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground));
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground)); }
+
+/* Smooth nav transitions */
+@layer utilities {
+  .nav-item-active {
+    background: hsl(239 84% 67% / 0.12);
+    color: hsl(239 84% 72%);
+  }
+  .nav-item-active-dot::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 60%;
+    background: hsl(239 84% 67%);
+    border-radius: 0 3px 3px 0;
+  }
 }
