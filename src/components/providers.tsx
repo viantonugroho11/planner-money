@@ -15,7 +15,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
     // Re-init on sign-in, reset on sign-out
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_IN") init();
+      if (event === "SIGNED_IN" || event === "INITIAL_SESSION" || event === "TOKEN_REFRESHED") init();
       if (event === "SIGNED_OUT") reset();
     });
 
