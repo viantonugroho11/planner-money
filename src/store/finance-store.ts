@@ -1,6 +1,6 @@
 "use client";
 import { create } from "zustand";
-import type { Wallet, Transaction, Category, Budget, Goal } from "@/lib/types";
+import type { Wallet, Transaction, Category, Budget, Goal, RecurringTransaction, IouRecord, Loan, Investment, WishlistItem, EventBudget, UtilityBill } from "@/lib/types";
 import * as db from "@/lib/db";
 import { DEFAULT_CATEGORIES, DEFAULT_WALLETS, generateSeedTransactions } from "@/lib/seed";
 
@@ -10,6 +10,13 @@ interface FinanceStore {
   categories: Category[];
   budgets: Budget[];
   goals: Goal[];
+  recurring: RecurringTransaction[];
+  iouRecords: IouRecord[];
+  loans: Loan[];
+  investments: Investment[];
+  wishlistItems: WishlistItem[];
+  eventBudgets: EventBudget[];
+  utilityBills: UtilityBill[];
   initialized: boolean;
 
   init: () => Promise<void>;
@@ -25,6 +32,11 @@ interface FinanceStore {
   updateTransaction: (tx: Transaction) => Promise<void>;
   removeTransaction: (id: string) => Promise<void>;
 
+  // Categories
+  addCategory: (cat: Category) => Promise<void>;
+  updateCategory: (cat: Category) => Promise<void>;
+  removeCategory: (id: string) => Promise<void>;
+
   // Budgets
   addBudget: (budget: Budget) => Promise<void>;
   removeBudget: (id: string) => Promise<void>;
@@ -33,6 +45,42 @@ interface FinanceStore {
   addGoal: (goal: Goal) => Promise<void>;
   updateGoal: (goal: Goal) => Promise<void>;
   removeGoal: (id: string) => Promise<void>;
+
+  // Recurring
+  addRecurring: (rt: RecurringTransaction) => Promise<void>;
+  updateRecurring: (rt: RecurringTransaction) => Promise<void>;
+  removeRecurring: (id: string) => Promise<void>;
+
+  // IOU
+  addIouRecord: (iou: IouRecord) => Promise<void>;
+  updateIouRecord: (iou: IouRecord) => Promise<void>;
+  removeIouRecord: (id: string) => Promise<void>;
+
+  // Loans
+  addLoan: (loan: Loan) => Promise<void>;
+  updateLoan: (loan: Loan) => Promise<void>;
+  removeLoan: (id: string) => Promise<void>;
+
+  // Investments
+  addInvestment: (inv: Investment) => Promise<void>;
+  updateInvestment: (inv: Investment) => Promise<void>;
+  removeInvestment: (id: string) => Promise<void>;
+
+  // Wishlist
+  addWishlistItem: (item: WishlistItem) => Promise<void>;
+  updateWishlistItem: (item: WishlistItem) => Promise<void>;
+  removeWishlistItem: (id: string) => Promise<void>;
+
+  // Event Budgets
+  addEventBudget: (ev: EventBudget) => Promise<void>;
+  updateEventBudget: (ev: EventBudget) => Promise<void>;
+  removeEventBudget: (id: string) => Promise<void>;
+
+  // Utility Bills
+  addUtilityBill: (bill: UtilityBill) => Promise<void>;
+  updateUtilityBill: (bill: UtilityBill) => Promise<void>;
+  removeUtilityBill: (id: string) => Promise<void>;
+  markUtilityPaid: (id: string) => Promise<void>;
 }
 
 export const useFinanceStore = create<FinanceStore>((set, get) => ({
@@ -41,21 +89,35 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
   categories: [],
   budgets: [],
   goals: [],
+  recurring: [],
+  iouRecords: [],
+  loans: [],
+  investments: [],
+  wishlistItems: [],
+  eventBudgets: [],
+  utilityBills: [],
   initialized: false,
 
   reset: () => {
-    set({ wallets: [], transactions: [], categories: [], budgets: [], goals: [], initialized: false });
+    set({ wallets: [], transactions: [], categories: [], budgets: [], goals: [], recurring: [], iouRecords: [], loans: [], investments: [], wishlistItems: [], eventBudgets: [], utilityBills: [], initialized: false });
   },
 
   init: async () => {
     if (get().initialized) return;
 
-    let [wallets, transactions, categories, budgets, goals] = await Promise.all([
+    let [wallets, transactions, categories, budgets, goals, recurring, iouRecords, loans, investments, wishlistItems, eventBudgets, utilityBills] = await Promise.all([
       db.getWallets(),
       db.getTransactions(),
       db.getCategories(),
       db.getBudgets(),
       db.getGoals(),
+      db.getRecurring(),
+      db.getIouRecords(),
+      db.getLoans(),
+      db.getInvestments(),
+      db.getWishlistItems(),
+      db.getEventBudgets(),
+      db.getUtilityBills(),
     ]);
 
     // Seed defaults on first run
@@ -73,7 +135,7 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
       transactions = seed.sort((a, b) => b.date - a.date);
     }
 
-    set({ wallets, transactions, categories, budgets, goals, initialized: true });
+    set({ wallets, transactions, categories, budgets, goals, recurring, iouRecords, loans, investments, wishlistItems, eventBudgets, utilityBills, initialized: true });
   },
 
   addWallet: async (wallet) => {
@@ -115,6 +177,20 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
     set((s) => ({ transactions: s.transactions.filter((t) => t.id !== id) }));
   },
 
+  addCategory: async (cat) => {
+    await db.saveCategory(cat);
+    set((s) => ({ categories: [...s.categories, cat] }));
+  },
+  updateCategory: async (cat) => {
+    await db.saveCategory(cat);
+    set((s) => ({ categories: s.categories.map((c) => (c.id === cat.id ? cat : c)) }));
+  },
+  removeCategory: async (id) => {
+    const { error } = await import("@/lib/supabase").then(m => m.supabase.from("categories").delete().eq("id", id));
+    if (error) throw error;
+    set((s) => ({ categories: s.categories.filter((c) => c.id !== id) }));
+  },
+
   addBudget: async (budget) => {
     await db.saveBudget(budget);
     set((s) => ({ budgets: [...s.budgets, budget] }));
@@ -135,5 +211,102 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
   removeGoal: async (id) => {
     await db.deleteGoal(id);
     set((s) => ({ goals: s.goals.filter((g) => g.id !== id) }));
+  },
+
+  addRecurring: async (rt) => {
+    await db.saveRecurring(rt);
+    set((s) => ({ recurring: [rt, ...s.recurring] }));
+  },
+  updateRecurring: async (rt) => {
+    await db.saveRecurring(rt);
+    set((s) => ({ recurring: s.recurring.map((r) => (r.id === rt.id ? rt : r)) }));
+  },
+  removeRecurring: async (id) => {
+    await db.deleteRecurring(id);
+    set((s) => ({ recurring: s.recurring.filter((r) => r.id !== id) }));
+  },
+
+  addIouRecord: async (iou) => {
+    await db.saveIouRecord(iou);
+    set((s) => ({ iouRecords: [iou, ...s.iouRecords] }));
+  },
+  updateIouRecord: async (iou) => {
+    await db.saveIouRecord(iou);
+    set((s) => ({ iouRecords: s.iouRecords.map((r) => (r.id === iou.id ? iou : r)) }));
+  },
+  removeIouRecord: async (id) => {
+    await db.deleteIouRecord(id);
+    set((s) => ({ iouRecords: s.iouRecords.filter((r) => r.id !== id) }));
+  },
+
+  addLoan: async (loan) => {
+    await db.saveLoan(loan);
+    set((s) => ({ loans: [loan, ...s.loans] }));
+  },
+  updateLoan: async (loan) => {
+    await db.saveLoan(loan);
+    set((s) => ({ loans: s.loans.map((l) => (l.id === loan.id ? loan : l)) }));
+  },
+  removeLoan: async (id) => {
+    await db.deleteLoan(id);
+    set((s) => ({ loans: s.loans.filter((l) => l.id !== id) }));
+  },
+
+  addInvestment: async (inv) => {
+    await db.saveInvestment(inv);
+    set((s) => ({ investments: [inv, ...s.investments] }));
+  },
+  updateInvestment: async (inv) => {
+    await db.saveInvestment(inv);
+    set((s) => ({ investments: s.investments.map((i) => (i.id === inv.id ? inv : i)) }));
+  },
+  removeInvestment: async (id) => {
+    await db.deleteInvestment(id);
+    set((s) => ({ investments: s.investments.filter((i) => i.id !== id) }));
+  },
+
+  addWishlistItem: async (item) => {
+    await db.saveWishlistItem(item);
+    set((s) => ({ wishlistItems: [item, ...s.wishlistItems] }));
+  },
+  updateWishlistItem: async (item) => {
+    await db.saveWishlistItem(item);
+    set((s) => ({ wishlistItems: s.wishlistItems.map((w) => (w.id === item.id ? item : w)) }));
+  },
+  removeWishlistItem: async (id) => {
+    await db.deleteWishlistItem(id);
+    set((s) => ({ wishlistItems: s.wishlistItems.filter((w) => w.id !== id) }));
+  },
+
+  addEventBudget: async (ev) => {
+    await db.saveEventBudget(ev);
+    set((s) => ({ eventBudgets: [ev, ...s.eventBudgets] }));
+  },
+  updateEventBudget: async (ev) => {
+    await db.saveEventBudget(ev);
+    set((s) => ({ eventBudgets: s.eventBudgets.map((e) => (e.id === ev.id ? ev : e)) }));
+  },
+  removeEventBudget: async (id) => {
+    await db.deleteEventBudget(id);
+    set((s) => ({ eventBudgets: s.eventBudgets.filter((e) => e.id !== id) }));
+  },
+
+  addUtilityBill: async (bill) => {
+    await db.saveUtilityBill(bill);
+    set((s) => ({ utilityBills: [bill, ...s.utilityBills] }));
+  },
+  updateUtilityBill: async (bill) => {
+    await db.saveUtilityBill(bill);
+    set((s) => ({ utilityBills: s.utilityBills.map((b) => (b.id === bill.id ? bill : b)) }));
+  },
+  removeUtilityBill: async (id) => {
+    await db.deleteUtilityBill(id);
+    set((s) => ({ utilityBills: s.utilityBills.filter((b) => b.id !== id) }));
+  },
+  markUtilityPaid: async (id) => {
+    await db.markUtilityBillPaid(id);
+    set((s) => ({
+      utilityBills: s.utilityBills.map((b) => b.id === id ? { ...b, lastPaidAt: Date.now() } : b)
+    }));
   },
 }));

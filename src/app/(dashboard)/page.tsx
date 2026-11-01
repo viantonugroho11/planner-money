@@ -137,7 +137,7 @@ export default function DashboardPage() {
               <YAxis tick={{ fontSize: 10, fill: "#888" }} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
               <Tooltip
                 contentStyle={{ background: "#1a1a2e", border: "1px solid #333", borderRadius: "8px", fontSize: 12 }}
-                formatter={(v: number) => formatCurrency(v)}
+                formatter={(v) => formatCurrency(Number(v))}
               />
               <Area type="monotone" dataKey="income" stroke="#4ade80" fill="url(#income-grad)" strokeWidth={2} dot={false} name="Income" />
               <Area type="monotone" dataKey="expense" stroke="#f87171" fill="url(#expense-grad)" strokeWidth={2} dot={false} name="Expense" />

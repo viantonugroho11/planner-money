@@ -1,15 +1,15 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, ArrowLeftRight, Wallet, PieChart, Target } from "lucide-react";
+import { LayoutDashboard, ArrowLeftRight, BarChart2, Grid3X3, Bot } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/transactions", label: "Transactions", icon: ArrowLeftRight },
-  { href: "/wallets", label: "Wallets", icon: Wallet },
-  { href: "/budgets", label: "Budgets", icon: PieChart },
-  { href: "/goals", label: "Goals", icon: Target },
+  { href: "/", label: "Home", icon: LayoutDashboard },
+  { href: "/transactions", label: "Transaksi", icon: ArrowLeftRight },
+  { href: "/insights", label: "Insights", icon: BarChart2 },
+  { href: "/iou", label: "IOU", icon: Grid3X3 },
+  { href: "/ai-coach", label: "AI Coach", icon: Bot },
 ];
 
 export function MobileNav() {
