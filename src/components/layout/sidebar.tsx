@@ -1,8 +1,9 @@
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { LayoutDashboard, ArrowLeftRight, Wallet, PieChart, Target, Settings, TrendingUp } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { LayoutDashboard, ArrowLeftRight, Wallet, PieChart, Target, Settings, TrendingUp, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase";
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -15,6 +16,14 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  async function handleLogout() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/login");
+    router.refresh();
+  }
 
   return (
     <aside className="hidden md:flex flex-col w-60 min-h-screen bg-card border-r border-border p-4 gap-1">
@@ -49,13 +58,22 @@ export function Sidebar() {
         })}
       </nav>
 
-      <Link
-        href="/settings"
-        className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
-      >
-        <Settings className="h-4 w-4" />
-        Settings
-      </Link>
+      <div className="flex flex-col gap-1">
+        <Link
+          href="/settings"
+          className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+        >
+          <Settings className="h-4 w-4" />
+          Settings
+        </Link>
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors w-full text-left"
+        >
+          <LogOut className="h-4 w-4" />
+          Logout
+        </button>
+      </div>
     </aside>
   );
 }

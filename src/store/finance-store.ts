@@ -13,6 +13,7 @@ interface FinanceStore {
   initialized: boolean;
 
   init: () => Promise<void>;
+  reset: () => void;
 
   // Wallets
   addWallet: (wallet: Wallet) => Promise<void>;
@@ -41,6 +42,10 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
   budgets: [],
   goals: [],
   initialized: false,
+
+  reset: () => {
+    set({ wallets: [], transactions: [], categories: [], budgets: [], goals: [], initialized: false });
+  },
 
   init: async () => {
     if (get().initialized) return;

@@ -1,6 +1,12 @@
 import { supabase } from "./supabase";
 import type { Wallet, Transaction, Category, Budget, Goal } from "./types";
 
+async function getUserId(): Promise<string> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not authenticated");
+  return user.id;
+}
+
 // ─── Mapping helpers (snake_case DB ↔ camelCase TS) ───────────────────────
 
 function walletFromDB(r: Record<string, unknown>): Wallet {
@@ -17,9 +23,10 @@ function walletFromDB(r: Record<string, unknown>): Wallet {
   };
 }
 
-function walletToDB(w: Wallet) {
+function walletToDB(w: Wallet, userId: string) {
   return {
     id: w.id,
+    user_id: userId,
     name: w.name,
     type: w.type,
     balance: w.balance,
@@ -48,9 +55,10 @@ function txFromDB(r: Record<string, unknown>): Transaction {
   };
 }
 
-function txToDB(tx: Transaction) {
+function txToDB(tx: Transaction, userId: string) {
   return {
     id: tx.id,
+    user_id: userId,
     type: tx.type,
     amount: tx.amount,
     currency: tx.currency,
@@ -76,9 +84,10 @@ function categoryFromDB(r: Record<string, unknown>): Category {
   };
 }
 
-function categoryToDB(c: Category) {
+function categoryToDB(c: Category, userId: string) {
   return {
     id: c.id,
+    user_id: userId,
     name: c.name,
     icon: c.icon,
     color: c.color,
@@ -98,9 +107,10 @@ function budgetFromDB(r: Record<string, unknown>): Budget {
   };
 }
 
-function budgetToDB(b: Budget) {
+function budgetToDB(b: Budget, userId: string) {
   return {
     id: b.id,
+    user_id: userId,
     category_id: b.categoryId,
     amount: b.amount,
     currency: b.currency,
@@ -124,9 +134,10 @@ function goalFromDB(r: Record<string, unknown>): Goal {
   };
 }
 
-function goalToDB(g: Goal) {
+function goalToDB(g: Goal, userId: string) {
   return {
     id: g.id,
+    user_id: userId,
     name: g.name,
     target_amount: g.targetAmount,
     current_amount: g.currentAmount,
@@ -148,9 +159,8 @@ export async function getWallets(): Promise<Wallet[]> {
 }
 
 export async function saveWallet(wallet: Wallet) {
-  const { error } = await supabase
-    .from("wallets")
-    .upsert(walletToDB(wallet));
+  const userId = await getUserId();
+  const { error } = await supabase.from("wallets").upsert(walletToDB(wallet, userId));
   if (error) throw error;
 }
 
@@ -171,9 +181,8 @@ export async function getTransactions(): Promise<Transaction[]> {
 }
 
 export async function saveTransaction(tx: Transaction) {
-  const { error } = await supabase
-    .from("transactions")
-    .upsert(txToDB(tx));
+  const userId = await getUserId();
+  const { error } = await supabase.from("transactions").upsert(txToDB(tx, userId));
   if (error) throw error;
 }
 
@@ -191,9 +200,8 @@ export async function getCategories(): Promise<Category[]> {
 }
 
 export async function saveCategory(cat: Category) {
-  const { error } = await supabase
-    .from("categories")
-    .upsert(categoryToDB(cat));
+  const userId = await getUserId();
+  const { error } = await supabase.from("categories").upsert(categoryToDB(cat, userId));
   if (error) throw error;
 }
 
@@ -206,9 +214,8 @@ export async function getBudgets(): Promise<Budget[]> {
 }
 
 export async function saveBudget(budget: Budget) {
-  const { error } = await supabase
-    .from("budgets")
-    .upsert(budgetToDB(budget));
+  const userId = await getUserId();
+  const { error } = await supabase.from("budgets").upsert(budgetToDB(budget, userId));
   if (error) throw error;
 }
 
@@ -226,9 +233,8 @@ export async function getGoals(): Promise<Goal[]> {
 }
 
 export async function saveGoal(goal: Goal) {
-  const { error } = await supabase
-    .from("goals")
-    .upsert(goalToDB(goal));
+  const userId = await getUserId();
+  const { error } = await supabase.from("goals").upsert(goalToDB(goal, userId));
   if (error) throw error;
 }
 
