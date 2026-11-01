@@ -1,101 +1,238 @@
-import { openDB, type IDBPDatabase } from "idb";
+import { supabase } from "./supabase";
 import type { Wallet, Transaction, Category, Budget, Goal } from "./types";
 
-const DB_NAME = "finance-ai-journal";
-const DB_VERSION = 1;
+// ─── Mapping helpers (snake_case DB ↔ camelCase TS) ───────────────────────
 
-let dbInstance: IDBPDatabase | null = null;
-
-export async function getDB() {
-  if (dbInstance) return dbInstance;
-  dbInstance = await openDB(DB_NAME, DB_VERSION, {
-    upgrade(db) {
-      if (!db.objectStoreNames.contains("wallets")) {
-        db.createObjectStore("wallets", { keyPath: "id" });
-      }
-      if (!db.objectStoreNames.contains("transactions")) {
-        const txStore = db.createObjectStore("transactions", { keyPath: "id" });
-        txStore.createIndex("date", "date");
-        txStore.createIndex("walletId", "walletId");
-        txStore.createIndex("categoryId", "categoryId");
-      }
-      if (!db.objectStoreNames.contains("categories")) {
-        db.createObjectStore("categories", { keyPath: "id" });
-      }
-      if (!db.objectStoreNames.contains("budgets")) {
-        db.createObjectStore("budgets", { keyPath: "id" });
-      }
-      if (!db.objectStoreNames.contains("goals")) {
-        db.createObjectStore("goals", { keyPath: "id" });
-      }
-    },
-  });
-  return dbInstance;
+function walletFromDB(r: Record<string, unknown>): Wallet {
+  return {
+    id: r.id as string,
+    name: r.name as string,
+    type: r.type as Wallet["type"],
+    balance: Number(r.balance),
+    currency: r.currency as string,
+    color: r.color as string,
+    icon: r.icon as string,
+    createdAt: Number(r.created_at),
+    updatedAt: Number(r.updated_at),
+  };
 }
 
-// Wallets
+function walletToDB(w: Wallet) {
+  return {
+    id: w.id,
+    name: w.name,
+    type: w.type,
+    balance: w.balance,
+    currency: w.currency,
+    color: w.color,
+    icon: w.icon,
+    created_at: w.createdAt,
+    updated_at: w.updatedAt,
+  };
+}
+
+function txFromDB(r: Record<string, unknown>): Transaction {
+  return {
+    id: r.id as string,
+    type: r.type as Transaction["type"],
+    amount: Number(r.amount),
+    currency: r.currency as string,
+    walletId: r.wallet_id as string,
+    toWalletId: r.to_wallet_id as string | undefined,
+    categoryId: r.category_id as string,
+    note: r.note as string | undefined,
+    date: Number(r.date),
+    tags: r.tags as string[] | undefined,
+    createdAt: Number(r.created_at),
+    updatedAt: Number(r.updated_at),
+  };
+}
+
+function txToDB(tx: Transaction) {
+  return {
+    id: tx.id,
+    type: tx.type,
+    amount: tx.amount,
+    currency: tx.currency,
+    wallet_id: tx.walletId,
+    to_wallet_id: tx.toWalletId ?? null,
+    category_id: tx.categoryId,
+    note: tx.note ?? null,
+    date: tx.date,
+    tags: tx.tags ?? null,
+    created_at: tx.createdAt,
+    updated_at: tx.updatedAt,
+  };
+}
+
+function categoryFromDB(r: Record<string, unknown>): Category {
+  return {
+    id: r.id as string,
+    name: r.name as string,
+    icon: r.icon as string,
+    color: r.color as string,
+    type: r.type as Category["type"],
+    parentId: r.parent_id as string | undefined,
+  };
+}
+
+function categoryToDB(c: Category) {
+  return {
+    id: c.id,
+    name: c.name,
+    icon: c.icon,
+    color: c.color,
+    type: c.type,
+    parent_id: c.parentId ?? null,
+  };
+}
+
+function budgetFromDB(r: Record<string, unknown>): Budget {
+  return {
+    id: r.id as string,
+    categoryId: r.category_id as string,
+    amount: Number(r.amount),
+    currency: r.currency as string,
+    period: r.period as Budget["period"],
+    createdAt: Number(r.created_at),
+  };
+}
+
+function budgetToDB(b: Budget) {
+  return {
+    id: b.id,
+    category_id: b.categoryId,
+    amount: b.amount,
+    currency: b.currency,
+    period: b.period,
+    created_at: b.createdAt,
+  };
+}
+
+function goalFromDB(r: Record<string, unknown>): Goal {
+  return {
+    id: r.id as string,
+    name: r.name as string,
+    targetAmount: Number(r.target_amount),
+    currentAmount: Number(r.current_amount),
+    currency: r.currency as string,
+    deadline: r.deadline ? Number(r.deadline) : undefined,
+    icon: r.icon as string,
+    color: r.color as string,
+    createdAt: Number(r.created_at),
+    updatedAt: Number(r.updated_at),
+  };
+}
+
+function goalToDB(g: Goal) {
+  return {
+    id: g.id,
+    name: g.name,
+    target_amount: g.targetAmount,
+    current_amount: g.currentAmount,
+    currency: g.currency,
+    deadline: g.deadline ?? null,
+    icon: g.icon,
+    color: g.color,
+    created_at: g.createdAt,
+    updated_at: g.updatedAt,
+  };
+}
+
+// ─── Wallets ───────────────────────────────────────────────────────────────
+
 export async function getWallets(): Promise<Wallet[]> {
-  const db = await getDB();
-  return db.getAll("wallets");
+  const { data, error } = await supabase.from("wallets").select("*");
+  if (error) throw error;
+  return (data ?? []).map((r) => walletFromDB(r as Record<string, unknown>));
 }
+
 export async function saveWallet(wallet: Wallet) {
-  const db = await getDB();
-  await db.put("wallets", wallet);
+  const { error } = await supabase
+    .from("wallets")
+    .upsert(walletToDB(wallet));
+  if (error) throw error;
 }
+
 export async function deleteWallet(id: string) {
-  const db = await getDB();
-  await db.delete("wallets", id);
+  const { error } = await supabase.from("wallets").delete().eq("id", id);
+  if (error) throw error;
 }
 
-// Transactions
+// ─── Transactions ──────────────────────────────────────────────────────────
+
 export async function getTransactions(): Promise<Transaction[]> {
-  const db = await getDB();
-  const all = await db.getAll("transactions");
-  return all.sort((a, b) => b.date - a.date);
+  const { data, error } = await supabase
+    .from("transactions")
+    .select("*")
+    .order("date", { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map((r) => txFromDB(r as Record<string, unknown>));
 }
+
 export async function saveTransaction(tx: Transaction) {
-  const db = await getDB();
-  await db.put("transactions", tx);
+  const { error } = await supabase
+    .from("transactions")
+    .upsert(txToDB(tx));
+  if (error) throw error;
 }
+
 export async function deleteTransaction(id: string) {
-  const db = await getDB();
-  await db.delete("transactions", id);
+  const { error } = await supabase.from("transactions").delete().eq("id", id);
+  if (error) throw error;
 }
 
-// Categories
+// ─── Categories ────────────────────────────────────────────────────────────
+
 export async function getCategories(): Promise<Category[]> {
-  const db = await getDB();
-  return db.getAll("categories");
+  const { data, error } = await supabase.from("categories").select("*");
+  if (error) throw error;
+  return (data ?? []).map((r) => categoryFromDB(r as Record<string, unknown>));
 }
+
 export async function saveCategory(cat: Category) {
-  const db = await getDB();
-  await db.put("categories", cat);
+  const { error } = await supabase
+    .from("categories")
+    .upsert(categoryToDB(cat));
+  if (error) throw error;
 }
 
-// Budgets
+// ─── Budgets ───────────────────────────────────────────────────────────────
+
 export async function getBudgets(): Promise<Budget[]> {
-  const db = await getDB();
-  return db.getAll("budgets");
-}
-export async function saveBudget(budget: Budget) {
-  const db = await getDB();
-  await db.put("budgets", budget);
-}
-export async function deleteBudget(id: string) {
-  const db = await getDB();
-  await db.delete("budgets", id);
+  const { data, error } = await supabase.from("budgets").select("*");
+  if (error) throw error;
+  return (data ?? []).map((r) => budgetFromDB(r as Record<string, unknown>));
 }
 
-// Goals
+export async function saveBudget(budget: Budget) {
+  const { error } = await supabase
+    .from("budgets")
+    .upsert(budgetToDB(budget));
+  if (error) throw error;
+}
+
+export async function deleteBudget(id: string) {
+  const { error } = await supabase.from("budgets").delete().eq("id", id);
+  if (error) throw error;
+}
+
+// ─── Goals ─────────────────────────────────────────────────────────────────
+
 export async function getGoals(): Promise<Goal[]> {
-  const db = await getDB();
-  return db.getAll("goals");
+  const { data, error } = await supabase.from("goals").select("*");
+  if (error) throw error;
+  return (data ?? []).map((r) => goalFromDB(r as Record<string, unknown>));
 }
+
 export async function saveGoal(goal: Goal) {
-  const db = await getDB();
-  await db.put("goals", goal);
+  const { error } = await supabase
+    .from("goals")
+    .upsert(goalToDB(goal));
+  if (error) throw error;
 }
+
 export async function deleteGoal(id: string) {
-  const db = await getDB();
-  await db.delete("goals", id);
+  const { error } = await supabase.from("goals").delete().eq("id", id);
+  if (error) throw error;
 }
