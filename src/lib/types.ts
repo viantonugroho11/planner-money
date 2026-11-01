@@ -202,6 +202,27 @@ export interface CategorizationRule {
   updatedAt: number;
 }
 
+export type HouseholdMemberRole = "owner" | "member";
+export type HouseholdMemberStatus = "pending" | "active" | "declined";
+
+export interface Household {
+  id: string;
+  name: string;
+  ownerId: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface HouseholdMember {
+  id: string;
+  householdId: string;
+  userId?: string;
+  invitedEmail?: string;
+  role: HouseholdMemberRole;
+  status: HouseholdMemberStatus;
+  createdAt: number;
+}
+
 export interface DashboardData {
   totalBalance: number;
   monthlyIncome: number;

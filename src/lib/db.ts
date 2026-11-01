@@ -1,5 +1,5 @@
 import { supabase } from "./supabase";
-import type { Wallet, Transaction, Category, Budget, Goal, RecurringTransaction, IouRecord, Loan, Investment, WishlistItem, EventBudget, UtilityBill, TravelPlan, CategorizationRule } from "./types";
+import type { Wallet, Transaction, Category, Budget, Goal, RecurringTransaction, IouRecord, Loan, Investment, WishlistItem, EventBudget, UtilityBill, TravelPlan, CategorizationRule, Household, HouseholdMember } from "./types";
 
 async function getUserId(): Promise<string> {
   const { data: { user } } = await supabase.auth.getUser();
@@ -609,5 +609,102 @@ export async function saveCategorizationRule(rule: CategorizationRule) {
 
 export async function deleteCategorizationRule(id: string) {
   const { error } = await supabase.from("categorization_rules").delete().eq("id", id);
+  if (error) throw error;
+}
+
+// ── Households ──────────────────────────────────────────────────────────────
+
+function householdFromDB(r: Record<string, unknown>): Household {
+  return {
+    id: r.id as string,
+    name: r.name as string,
+    ownerId: r.owner_id as string,
+    createdAt: new Date(r.created_at as string).getTime(),
+    updatedAt: new Date(r.updated_at as string).getTime(),
+  };
+}
+
+function memberFromDB(r: Record<string, unknown>): HouseholdMember {
+  return {
+    id: r.id as string,
+    householdId: r.household_id as string,
+    userId: r.user_id as string | undefined,
+    invitedEmail: r.invited_email as string | undefined,
+    role: r.role as HouseholdMember["role"],
+    status: r.status as HouseholdMember["status"],
+    createdAt: new Date(r.created_at as string).getTime(),
+  };
+}
+
+export async function getMyHousehold(): Promise<Household | null> {
+  const userId = await getUserId();
+  const { data, error } = await supabase.from("households").select("*").eq("owner_id", userId).maybeSingle();
+  if (error) throw error;
+  return data ? householdFromDB(data) : null;
+}
+
+export async function getHouseholdImMemberOf(): Promise<Household | null> {
+  const { data, error } = await supabase
+    .from("household_members").select("household_id, households(*)")
+    .eq("status", "active").maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  const h = (data as Record<string, unknown>).households;
+  return h ? householdFromDB(h as Record<string, unknown>) : null;
+}
+
+export async function createHousehold(name: string): Promise<Household> {
+  const userId = await getUserId();
+  const { data, error } = await supabase.from("households")
+    .insert({ name, owner_id: userId }).select().single();
+  if (error) throw error;
+  return householdFromDB(data);
+}
+
+export async function updateHouseholdName(id: string, name: string) {
+  const { error } = await supabase.from("households").update({ name, updated_at: new Date().toISOString() }).eq("id", id);
+  if (error) throw error;
+}
+
+export async function deleteHousehold(id: string) {
+  const { error } = await supabase.from("households").delete().eq("id", id);
+  if (error) throw error;
+}
+
+export async function getHouseholdMembers(householdId: string): Promise<HouseholdMember[]> {
+  const { data, error } = await supabase.from("household_members").select("*").eq("household_id", householdId);
+  if (error) throw error;
+  return (data ?? []).map(memberFromDB);
+}
+
+export async function inviteMember(householdId: string, email: string): Promise<HouseholdMember> {
+  const { data, error } = await supabase.from("household_members")
+    .insert({ household_id: householdId, invited_email: email, role: "member", status: "pending" })
+    .select().single();
+  if (error) throw error;
+  return memberFromDB(data);
+}
+
+export async function removeMember(memberId: string) {
+  const { error } = await supabase.from("household_members").delete().eq("id", memberId);
+  if (error) throw error;
+}
+
+export async function getPendingInvites(): Promise<(HouseholdMember & { householdName: string })[]> {
+  const { data, error } = await supabase
+    .from("household_members").select("*, households(name)")
+    .eq("status", "pending");
+  if (error) throw error;
+  return (data ?? []).map((r) => ({
+    ...memberFromDB(r),
+    householdName: (r.households as Record<string, unknown>)?.name as string ?? "",
+  }));
+}
+
+export async function respondToInvite(memberId: string, accept: boolean): Promise<void> {
+  const userId = await getUserId();
+  const { error } = await supabase.from("household_members")
+    .update({ status: accept ? "active" : "declined", user_id: accept ? userId : null })
+    .eq("id", memberId);
   if (error) throw error;
 }
