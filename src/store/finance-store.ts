@@ -1,6 +1,6 @@
 "use client";
 import { create } from "zustand";
-import type { Wallet, Transaction, Category, Budget, Goal, RecurringTransaction, IouRecord, Loan, Investment, WishlistItem, EventBudget, UtilityBill } from "@/lib/types";
+import type { Wallet, Transaction, Category, Budget, Goal, RecurringTransaction, IouRecord, Loan, Investment, WishlistItem, EventBudget, UtilityBill, TravelPlan, CategorizationRule } from "@/lib/types";
 import * as db from "@/lib/db";
 import { DEFAULT_CATEGORIES, DEFAULT_WALLETS, generateSeedTransactions } from "@/lib/seed";
 
@@ -17,6 +17,8 @@ interface FinanceStore {
   wishlistItems: WishlistItem[];
   eventBudgets: EventBudget[];
   utilityBills: UtilityBill[];
+  travelPlans: TravelPlan[];
+  categorizationRules: CategorizationRule[];
   initialized: boolean;
 
   init: () => Promise<void>;
@@ -81,6 +83,16 @@ interface FinanceStore {
   updateUtilityBill: (bill: UtilityBill) => Promise<void>;
   removeUtilityBill: (id: string) => Promise<void>;
   markUtilityPaid: (id: string) => Promise<void>;
+
+  // Travel Plans
+  addTravelPlan: (plan: TravelPlan) => Promise<void>;
+  updateTravelPlan: (plan: TravelPlan) => Promise<void>;
+  removeTravelPlan: (id: string) => Promise<void>;
+
+  // Categorization Rules
+  addCategorizationRule: (rule: CategorizationRule) => Promise<void>;
+  updateCategorizationRule: (rule: CategorizationRule) => Promise<void>;
+  removeCategorizationRule: (id: string) => Promise<void>;
 }
 
 export const useFinanceStore = create<FinanceStore>((set, get) => ({
@@ -96,16 +108,18 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
   wishlistItems: [],
   eventBudgets: [],
   utilityBills: [],
+  travelPlans: [],
+  categorizationRules: [],
   initialized: false,
 
   reset: () => {
-    set({ wallets: [], transactions: [], categories: [], budgets: [], goals: [], recurring: [], iouRecords: [], loans: [], investments: [], wishlistItems: [], eventBudgets: [], utilityBills: [], initialized: false });
+    set({ wallets: [], transactions: [], categories: [], budgets: [], goals: [], recurring: [], iouRecords: [], loans: [], investments: [], wishlistItems: [], eventBudgets: [], utilityBills: [], travelPlans: [], categorizationRules: [], initialized: false });
   },
 
   init: async () => {
     if (get().initialized) return;
 
-    let [wallets, transactions, categories, budgets, goals, recurring, iouRecords, loans, investments, wishlistItems, eventBudgets, utilityBills] = await Promise.all([
+    let [wallets, transactions, categories, budgets, goals, recurring, iouRecords, loans, investments, wishlistItems, eventBudgets, utilityBills, travelPlans, categorizationRules] = await Promise.all([
       db.getWallets(),
       db.getTransactions(),
       db.getCategories(),
@@ -118,6 +132,8 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
       db.getWishlistItems(),
       db.getEventBudgets(),
       db.getUtilityBills(),
+      db.getTravelPlans(),
+      db.getCategorizationRules(),
     ]);
 
     // Seed defaults on first run
@@ -135,7 +151,7 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
       transactions = seed.sort((a, b) => b.date - a.date);
     }
 
-    set({ wallets, transactions, categories, budgets, goals, recurring, iouRecords, loans, investments, wishlistItems, eventBudgets, utilityBills, initialized: true });
+    set({ wallets, transactions, categories, budgets, goals, recurring, iouRecords, loans, investments, wishlistItems, eventBudgets, utilityBills, travelPlans, categorizationRules, initialized: true });
   },
 
   addWallet: async (wallet) => {
@@ -308,5 +324,31 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
     set((s) => ({
       utilityBills: s.utilityBills.map((b) => b.id === id ? { ...b, lastPaidAt: Date.now() } : b)
     }));
+  },
+
+  addTravelPlan: async (plan) => {
+    await db.saveTravelPlan(plan);
+    set((s) => ({ travelPlans: [plan, ...s.travelPlans] }));
+  },
+  updateTravelPlan: async (plan) => {
+    await db.saveTravelPlan(plan);
+    set((s) => ({ travelPlans: s.travelPlans.map((p) => (p.id === plan.id ? plan : p)) }));
+  },
+  removeTravelPlan: async (id) => {
+    await db.deleteTravelPlan(id);
+    set((s) => ({ travelPlans: s.travelPlans.filter((p) => p.id !== id) }));
+  },
+
+  addCategorizationRule: async (rule) => {
+    await db.saveCategorizationRule(rule);
+    set((s) => ({ categorizationRules: [...s.categorizationRules, rule].sort((a, b) => a.priority - b.priority) }));
+  },
+  updateCategorizationRule: async (rule) => {
+    await db.saveCategorizationRule(rule);
+    set((s) => ({ categorizationRules: s.categorizationRules.map((r) => (r.id === rule.id ? rule : r)) }));
+  },
+  removeCategorizationRule: async (id) => {
+    await db.deleteCategorizationRule(id);
+    set((s) => ({ categorizationRules: s.categorizationRules.filter((r) => r.id !== id) }));
   },
 }));

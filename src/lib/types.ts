@@ -167,6 +167,41 @@ export interface UtilityBill {
   updatedAt: number;
 }
 
+export type TravelItemCategory = "transport" | "accommodation" | "food" | "activities" | "shopping" | "other";
+
+export interface TravelItem {
+  id: string;
+  name: string;
+  estimatedCost: number;
+  actualCost: number;
+  category: TravelItemCategory;
+  paid: boolean;
+}
+
+export interface TravelPlan {
+  id: string;
+  name: string;
+  destination: string;
+  startDate: string;
+  endDate: string;
+  totalBudget: number;
+  items: TravelItem[];
+  createdAt: number;
+  updatedAt: number;
+}
+
+export type CategorizationMatchType = "contains" | "startsWith" | "endsWith";
+
+export interface CategorizationRule {
+  id: string;
+  keyword: string;
+  categoryId: string;
+  matchType: CategorizationMatchType;
+  priority: number;
+  createdAt: number;
+  updatedAt: number;
+}
+
 export interface DashboardData {
   totalBalance: number;
   monthlyIncome: number;

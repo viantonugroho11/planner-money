@@ -1,5 +1,5 @@
 import { supabase } from "./supabase";
-import type { Wallet, Transaction, Category, Budget, Goal, RecurringTransaction, IouRecord, Loan, Investment, WishlistItem, EventBudget, UtilityBill } from "./types";
+import type { Wallet, Transaction, Category, Budget, Goal, RecurringTransaction, IouRecord, Loan, Investment, WishlistItem, EventBudget, UtilityBill, TravelPlan, CategorizationRule } from "./types";
 
 async function getUserId(): Promise<string> {
   const { data: { user } } = await supabase.auth.getUser();
@@ -528,5 +528,86 @@ export async function markUtilityBillPaid(id: string) {
     .from("utility_bills")
     .update({ last_paid_at: Date.now(), updated_at: Date.now() })
     .eq("id", id).eq("user_id", userId);
+  if (error) throw error;
+}
+
+// ─── Travel Plans ──────────────────────────────────────────────────────────
+
+function travelPlanFromDB(r: Record<string, unknown>): TravelPlan {
+  return {
+    id: r.id as string,
+    name: r.name as string,
+    destination: (r.destination as string) ?? "",
+    startDate: (r.start_date as string) ?? "",
+    endDate: (r.end_date as string) ?? "",
+    totalBudget: Number(r.total_budget),
+    items: (r.items as TravelPlan["items"]) ?? [],
+    createdAt: Number(r.created_at),
+    updatedAt: Number(r.updated_at),
+  };
+}
+
+function travelPlanToDB(plan: TravelPlan, userId: string) {
+  return {
+    id: plan.id, user_id: userId, name: plan.name,
+    destination: plan.destination, start_date: plan.startDate, end_date: plan.endDate,
+    total_budget: plan.totalBudget, items: plan.items,
+    created_at: plan.createdAt, updated_at: plan.updatedAt,
+  };
+}
+
+export async function getTravelPlans(): Promise<TravelPlan[]> {
+  const { data, error } = await supabase.from("travel_plans").select("*").order("created_at", { ascending: false });
+  if (error) return [];
+  return (data ?? []).map((r) => travelPlanFromDB(r as Record<string, unknown>));
+}
+
+export async function saveTravelPlan(plan: TravelPlan) {
+  const userId = await getUserId();
+  const { error } = await supabase.from("travel_plans").upsert(travelPlanToDB(plan, userId));
+  if (error) throw error;
+}
+
+export async function deleteTravelPlan(id: string) {
+  const { error } = await supabase.from("travel_plans").delete().eq("id", id);
+  if (error) throw error;
+}
+
+// ─── Categorization Rules ─────────────────────────────────────────────────
+
+function ruleFromDB(r: Record<string, unknown>): CategorizationRule {
+  return {
+    id: r.id as string,
+    keyword: r.keyword as string,
+    categoryId: r.category_id as string,
+    matchType: r.match_type as CategorizationRule["matchType"],
+    priority: Number(r.priority),
+    createdAt: Number(r.created_at),
+    updatedAt: Number(r.updated_at),
+  };
+}
+
+function ruleToDB(rule: CategorizationRule, userId: string) {
+  return {
+    id: rule.id, user_id: userId, keyword: rule.keyword,
+    category_id: rule.categoryId, match_type: rule.matchType,
+    priority: rule.priority, created_at: rule.createdAt, updated_at: rule.updatedAt,
+  };
+}
+
+export async function getCategorizationRules(): Promise<CategorizationRule[]> {
+  const { data, error } = await supabase.from("categorization_rules").select("*").order("priority", { ascending: true });
+  if (error) return [];
+  return (data ?? []).map((r) => ruleFromDB(r as Record<string, unknown>));
+}
+
+export async function saveCategorizationRule(rule: CategorizationRule) {
+  const userId = await getUserId();
+  const { error } = await supabase.from("categorization_rules").upsert(ruleToDB(rule, userId));
+  if (error) throw error;
+}
+
+export async function deleteCategorizationRule(id: string) {
+  const { error } = await supabase.from("categorization_rules").delete().eq("id", id);
   if (error) throw error;
 }

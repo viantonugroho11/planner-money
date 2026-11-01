@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, ArrowLeftRight, Wallet, PieChart, Target, Settings, TrendingUp, LogOut, BarChart2, Tag, RefreshCw, Send, HandCoins, Heart, Building2, TrendingDown, Calendar, Zap, Bot, DollarSign } from "lucide-react";
+import { LayoutDashboard, ArrowLeftRight, Wallet, PieChart, Target, Settings, TrendingUp, LogOut, BarChart2, Tag, RefreshCw, Send, HandCoins, Heart, Building2, TrendingDown, Calendar, Zap, Bot, DollarSign, Download, Calculator, Plane, CalendarDays, Sparkles, Receipt } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase";
 
@@ -46,6 +46,11 @@ const navGroups = [
     items: [
       { href: "/event-budget", label: "Anggaran Event", icon: Calendar },
       { href: "/utility-bills", label: "Tagihan", icon: Zap },
+      { href: "/cashflow-calendar", label: "Kalender Cashflow", icon: CalendarDays },
+      { href: "/travel-planner", label: "Travel Planner", icon: Plane },
+      { href: "/categorization-rules", label: "Auto-Kategori", icon: Sparkles },
+      { href: "/tax-zakat", label: "Pajak & Zakat", icon: Calculator },
+      { href: "/export-import", label: "Export / Import", icon: Download },
       { href: "/ai-coach", label: "AI Coach", icon: Bot },
     ],
   },
