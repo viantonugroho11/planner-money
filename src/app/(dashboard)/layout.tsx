@@ -1,4 +1,5 @@
 import { Sidebar } from "@/components/layout/sidebar";
+import { LoadErrorBanner } from "@/components/layout/load-error-banner";
 import { MobileNav } from "@/components/layout/mobile-nav";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -6,6 +7,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div className="flex min-h-screen">
       <Sidebar />
       <main className="flex-1 flex flex-col min-w-0 pb-20 md:pb-0">
+        <LoadErrorBanner />
         {children}
       </main>
       <MobileNav />

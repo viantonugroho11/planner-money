@@ -1,4 +1,5 @@
 "use client";
+import { PageLoading } from "@/components/ui/page-loading";
 import { useState } from "react";
 import { useFinanceStore } from "@/store/finance-store";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -57,7 +58,7 @@ export default function GoalsPage() {
     setContribute(null);
   }
 
-  if (!initialized) return <div className="p-6 text-muted-foreground animate-pulse">Memuat data…</div>;
+  if (!initialized) return <PageLoading />;
 
   return (
     <div className="p-4 md:p-6 space-y-4">

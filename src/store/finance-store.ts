@@ -1,4 +1,5 @@
 "use client";
+import { supabase } from "@/lib/supabase";
 import { create } from "zustand";
 import type { Wallet, Transaction, Category, Budget, Goal, RecurringTransaction, IouRecord, Loan, Investment, WishlistItem, EventBudget, UtilityBill, TravelPlan, CategorizationRule } from "@/lib/types";
 import * as db from "@/lib/db";
@@ -20,6 +21,7 @@ interface FinanceStore {
   travelPlans: TravelPlan[];
   categorizationRules: CategorizationRule[];
   initialized: boolean;
+  loadError: boolean;
 
   init: () => Promise<void>;
   reset: () => void;
@@ -113,10 +115,11 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
   travelPlans: [],
   categorizationRules: [],
   initialized: false,
+  loadError: false,
 
   reset: () => {
     initPromise = null;
-    set({ wallets: [], transactions: [], categories: [], budgets: [], goals: [], recurring: [], iouRecords: [], loans: [], investments: [], wishlistItems: [], eventBudgets: [], utilityBills: [], travelPlans: [], categorizationRules: [], initialized: false });
+    set({ wallets: [], transactions: [], categories: [], budgets: [], goals: [], recurring: [], iouRecords: [], loans: [], investments: [], wishlistItems: [], eventBudgets: [], utilityBills: [], travelPlans: [], categorizationRules: [], initialized: false, loadError: false });
   },
 
   init: async () => {
@@ -141,25 +144,32 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
       db.getCategorizationRules(),
     ]);
 
-    // Seed defaults on first run
-    if (categories.length === 0) {
-      await Promise.all(DEFAULT_CATEGORIES.map((c) => db.saveCategory(c)));
-      categories = DEFAULT_CATEGORIES;
-    }
-    if (wallets.length === 0) {
-      await Promise.all(DEFAULT_WALLETS.map((w) => db.saveWallet(w)));
-      wallets = DEFAULT_WALLETS;
-    }
-    if (transactions.length === 0) {
-      const seed = generateSeedTransactions();
-      await Promise.all(seed.map((t) => db.saveTransaction(t)));
-      transactions = seed.sort((a, b) => b.date - a.date);
+    // Seed defaults on first run. Default ids are prefixed per user because
+    // table primary keys are global (otherwise a 2nd user collides with the 1st).
+    if (categories.length === 0 || wallets.length === 0 || transactions.length === 0) {
+      const { data: { user } } = await supabase.auth.getUser();
+      const p = `${(user?.id ?? "anon").slice(0, 8)}_`;
+      if (categories.length === 0) {
+        const seed = DEFAULT_CATEGORIES.map((c) => ({ ...c, id: p + c.id, parentId: c.parentId ? p + c.parentId : undefined }));
+        await Promise.all(seed.map((c) => db.saveCategory(c)));
+        categories = seed;
+      }
+      if (wallets.length === 0) {
+        const seed = DEFAULT_WALLETS.map((w) => ({ ...w, id: p + w.id }));
+        await Promise.all(seed.map((w) => db.saveWallet(w)));
+        wallets = seed;
+      }
+      if (transactions.length === 0) {
+        const seed = generateSeedTransactions().map((t) => ({ ...t, id: p + t.id, walletId: p + t.walletId, categoryId: p + t.categoryId }));
+        await Promise.all(seed.map((t) => db.saveTransaction(t)));
+        transactions = seed.sort((a, b) => b.date - a.date);
+      }
     }
 
     set({ wallets, transactions, categories, budgets, goals, recurring, iouRecords, loans, investments, wishlistItems, eventBudgets, utilityBills, travelPlans, categorizationRules, initialized: true });
     } catch (e) {
       console.error("Gagal memuat data dari Supabase", e);
-      set({ initialized: true });
+      set({ initialized: true, loadError: true });
     } finally {
       initPromise = null;
     }

@@ -99,3 +99,119 @@ CREATE POLICY household_members_self_read ON household_members
   FOR SELECT USING (user_id = auth.uid() OR invited_email = (auth.jwt() ->> 'email'));
 CREATE POLICY household_members_self_update ON household_members
   FOR UPDATE USING (user_id = auth.uid() OR invited_email = (auth.jwt() ->> 'email'));
+
+-- ============================================================
+-- Feature tables (per-user, RLS: auth.uid() = user_id)
+-- ============================================================
+create table if not exists recurring_transactions (
+  id text primary key,
+  user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  amount numeric not null,
+  type text not null,
+  category_id text not null,
+  wallet_id text not null,
+  description text not null default '',
+  frequency text not null,
+  next_occurrence bigint not null,
+  start_date bigint,
+  is_active boolean not null default true,
+  created_at bigint not null,
+  updated_at bigint not null
+);
+
+create table if not exists iou_records (
+  id text primary key,
+  user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  person_name text not null,
+  phone_number text,
+  direction text not null,
+  total_amount numeric not null,
+  remaining_amount numeric not null,
+  description text,
+  due_date bigint,
+  status text not null,
+  created_at bigint not null,
+  updated_at bigint not null
+);
+
+create table if not exists loans (
+  id text primary key,
+  user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  name text not null,
+  principal numeric not null,
+  annual_interest_rate numeric not null,
+  term_months integer not null,
+  start_date bigint not null,
+  remaining_principal numeric not null,
+  currency text not null default 'IDR',
+  created_at bigint not null,
+  updated_at bigint not null
+);
+
+create table if not exists investments (
+  id text primary key,
+  user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  name text not null,
+  type text not null,
+  ticker text,
+  units numeric not null,
+  avg_price numeric not null,
+  current_price numeric not null,
+  currency text not null default 'IDR',
+  created_at bigint not null,
+  updated_at bigint not null
+);
+
+create table if not exists wishlist_items (
+  id text primary key,
+  user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  name text not null,
+  target_price numeric not null,
+  saved_amount numeric not null default 0,
+  currency text not null default 'IDR',
+  target_date bigint,
+  priority text not null,
+  notes text,
+  created_at bigint not null,
+  updated_at bigint not null
+);
+
+create table if not exists event_budgets (
+  id text primary key,
+  user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  name text not null,
+  date bigint not null,
+  total_budget numeric not null,
+  currency text not null default 'IDR',
+  items jsonb not null default '[]'::jsonb,
+  created_at bigint not null,
+  updated_at bigint not null
+);
+
+create table if not exists utility_bills (
+  id text primary key,
+  user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  name text not null,
+  amount numeric not null,
+  currency text not null default 'IDR',
+  due_day integer not null,
+  category text not null,
+  is_active boolean not null default true,
+  last_paid_at bigint,
+  created_at bigint not null,
+  updated_at bigint not null
+);
+
+do $$
+declare t text;
+begin
+  foreach t in array array['recurring_transactions','iou_records','loans','investments','wishlist_items','event_budgets','utility_bills']
+  loop
+    execute format('alter table %I enable row level security', t);
+    execute format('drop policy if exists %I on %I', t || '_own', t);
+    execute format('create policy %I on %I for all using (auth.uid() = user_id) with check (auth.uid() = user_id)', t || '_own', t);
+    execute format('create index if not exists %I on %I(user_id)', t || '_user_idx', t);
+  end loop;
+end $$;
+
+notify pgrst, 'reload schema';

@@ -1,4 +1,5 @@
 "use client";
+import { PageLoading } from "@/components/ui/page-loading";
 import { useState } from "react";
 import { useFinanceStore } from "@/store/finance-store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -71,7 +72,7 @@ export default function TravelPlannerPage() {
 
   const totalBalance = wallets.reduce((s, w) => s + w.balance, 0);
 
-  if (!initialized) return <div className="flex items-center justify-center h-screen"><div className="text-muted-foreground animate-pulse">Memuat data…</div></div>;
+  if (!initialized) return <PageLoading />;
 
   return (
     <div className="p-4 md:p-6 space-y-6">

@@ -1,4 +1,5 @@
 "use client";
+import { PageLoading } from "@/components/ui/page-loading";
 import { useEffect, useState, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -109,11 +110,7 @@ export default function FamilyPage() {
   const activeMembers = members.filter((m) => m.status === "active");
   const pendingMembers = members.filter((m) => m.status === "pending");
 
-  if (loading) return (
-    <div className="flex items-center justify-center h-screen">
-      <div className="text-muted-foreground animate-pulse">Memuat data…</div>
-    </div>
-  );
+  if (loading) return <PageLoading />;
 
   return (
     <div className="p-4 md:p-6 space-y-6 max-w-2xl">
