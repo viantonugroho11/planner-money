@@ -95,6 +95,8 @@ interface FinanceStore {
   removeCategorizationRule: (id: string) => Promise<void>;
 }
 
+let initPromise: Promise<void> | null = null;
+
 export const useFinanceStore = create<FinanceStore>((set, get) => ({
   wallets: [],
   transactions: [],
@@ -113,12 +115,15 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
   initialized: false,
 
   reset: () => {
+    initPromise = null;
     set({ wallets: [], transactions: [], categories: [], budgets: [], goals: [], recurring: [], iouRecords: [], loans: [], investments: [], wishlistItems: [], eventBudgets: [], utilityBills: [], travelPlans: [], categorizationRules: [], initialized: false });
   },
 
   init: async () => {
     if (get().initialized) return;
-
+    if (initPromise) return initPromise;
+    initPromise = (async () => {
+    try {
     let [wallets, transactions, categories, budgets, goals, recurring, iouRecords, loans, investments, wishlistItems, eventBudgets, utilityBills, travelPlans, categorizationRules] = await Promise.all([
       db.getWallets(),
       db.getTransactions(),
@@ -152,6 +157,14 @@ export const useFinanceStore = create<FinanceStore>((set, get) => ({
     }
 
     set({ wallets, transactions, categories, budgets, goals, recurring, iouRecords, loans, investments, wishlistItems, eventBudgets, utilityBills, travelPlans, categorizationRules, initialized: true });
+    } catch (e) {
+      console.error("Gagal memuat data dari Supabase", e);
+      set({ initialized: true });
+    } finally {
+      initPromise = null;
+    }
+    })();
+    return initPromise;
   },
 
   addWallet: async (wallet) => {
