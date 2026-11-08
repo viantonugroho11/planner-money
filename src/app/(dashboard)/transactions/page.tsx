@@ -13,9 +13,9 @@ import { Plus, Search, Trash2, Filter } from "lucide-react";
 import type { Transaction, TransactionType } from "@/lib/types";
 
 const PERIOD_OPTIONS = [
-  { label: "This Month", value: "month" },
-  { label: "Last 3 Months", value: "3m" },
-  { label: "All Time", value: "all" },
+  { label: "Bulan ini", value: "month" },
+  { label: "3 bulan terakhir", value: "3m" },
+  { label: "Semua waktu", value: "all" },
 ];
 
 function TransactionForm({
@@ -171,7 +171,7 @@ export default function TransactionsPage() {
   return (
     <div className="p-4 md:p-6 space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Transactions</h1>
+        <h1 className="text-xl font-semibold">Transaksi</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button size="sm">
@@ -196,7 +196,7 @@ export default function TransactionsPage() {
       <div className="flex flex-wrap gap-2">
         <div className="relative flex-1 min-w-40">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input className="pl-8" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
+          <Input className="pl-8" placeholder="Cari transaksi…" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
         <Select value={period} onValueChange={setPeriod}>
           <SelectTrigger className="w-36">
@@ -213,7 +213,7 @@ export default function TransactionsPage() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="all">Semua</SelectItem>
             <SelectItem value="income">Income</SelectItem>
             <SelectItem value="expense">Expense</SelectItem>
             <SelectItem value="transfer">Transfer</SelectItem>
@@ -222,13 +222,13 @@ export default function TransactionsPage() {
       </div>
 
       {/* Summary bar */}
-      <div className="flex gap-4 text-sm">
+      <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
         <span className="text-income font-medium">+{formatCurrency(totalFiltered.income)}</span>
         <span className="text-expense font-medium">-{formatCurrency(totalFiltered.expense)}</span>
         <span className={`font-medium ${totalFiltered.net >= 0 ? "text-income" : "text-expense"}`}>
-          Net: {formatCurrency(Math.abs(totalFiltered.net))}
+          Selisih: {formatCurrency(Math.abs(totalFiltered.net))}
         </span>
-        <span className="text-muted-foreground ml-auto">{filtered.length} transactions</span>
+        <span className="text-muted-foreground ml-auto">{filtered.length} transaksi</span>
       </div>
 
       {/* Transaction list */}

@@ -51,6 +51,22 @@
   h1, h2, h3 {
     letter-spacing: -0.02em;
   }
+
+  /* Native controls: dark popups/scrollbars, one consistent focus style */
+  select, input, textarea { color-scheme: dark; }
+  input:not([type="checkbox"]):not([type="radio"]):focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: none;
+    border-color: hsl(var(--ring));
+    box-shadow: 0 0 0 3px hsl(var(--ring) / 0.25);
+  }
+  button:focus-visible, a:focus-visible, [role="button"]:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+  input::placeholder, textarea::placeholder { color: hsl(var(--muted-foreground) / 0.7); }
+  input[type="number"]::-webkit-inner-spin-button { opacity: 0.4; }
 }
 
 /* Scrollbar */

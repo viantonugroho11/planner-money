@@ -87,7 +87,7 @@ function WalletForm({ onSave }: { onSave: (w: Wallet) => void }) {
         </div>
       </div>
       <Button className="w-full" onClick={handleSave} disabled={!name}>
-        Add Wallet
+        Tambah dompet
       </Button>
     </div>
   );
@@ -105,16 +105,16 @@ export default function WalletsPage() {
     <div className="p-4 md:p-6 space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold">Wallets</h1>
+          <h1 className="text-xl font-semibold">Dompet</h1>
           <p className="text-sm text-muted-foreground">Total: {formatCurrency(totalBalance)}</p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button size="sm"><Plus className="h-4 w-4" /> Add Wallet</Button>
+            <Button size="sm"><Plus className="h-4 w-4" /> Tambah dompet</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Add Wallet</DialogTitle>
+              <DialogTitle>Tambah dompet</DialogTitle>
             </DialogHeader>
             <WalletForm
               onSave={(w) => {

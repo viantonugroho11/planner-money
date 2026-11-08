@@ -30,9 +30,9 @@ export default function WishlistPage() {
   const priorityColor = { high: "text-red-500", medium: "text-yellow-500", low: "text-green-500" };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 md:p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Wishlist</h1>
+        <h1 className="text-xl font-semibold">Wishlist</h1>
         <button onClick={openNew} className="flex items-center gap-2 bg-primary text-primary-foreground px-3 py-2 rounded-lg text-sm font-medium">
           <Plus className="h-4 w-4" /> Add
         </button>

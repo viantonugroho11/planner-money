@@ -29,9 +29,9 @@ export default function EventBudgetPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 md:p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Event / Acara</h1>
+        <h1 className="text-xl font-semibold">Event / Acara</h1>
         <button onClick={() => setOpen(true)} className="flex items-center gap-2 bg-primary text-primary-foreground px-3 py-2 rounded-lg text-sm font-medium">
           <Plus className="h-4 w-4" /> Add
         </button>
@@ -75,7 +75,7 @@ export default function EventBudgetPage() {
                 if (!itemForm.name || !itemForm.budget) return;
                 setItems((prev) => [...prev, { name: itemForm.name, budget: Number(itemForm.budget), spent: 0 }]);
                 setItemForm({ name: "", budget: "", spent: "" });
-              }} className="bg-secondary px-2 py-1 rounded text-xs">Add</button>
+              }} className="bg-secondary px-2 py-1 rounded text-xs">Tambah</button>
             </div>
           </div>
           <div className="flex gap-2">

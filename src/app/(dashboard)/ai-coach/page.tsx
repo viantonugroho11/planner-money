@@ -61,13 +61,13 @@ export default function AiCoachPage() {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] p-6 gap-4">
+    <div className="flex flex-col h-[calc(100vh-4rem)] p-4 md:p-6 gap-4">
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
           <Bot className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <h1 className="text-lg font-bold">AI Coach Keuangan</h1>
+          <h1 className="text-xl font-semibold">AI Coach Keuangan</h1>
           <p className="text-xs text-muted-foreground">Powered by AI · Data real-time dari akun Anda</p>
         </div>
       </div>

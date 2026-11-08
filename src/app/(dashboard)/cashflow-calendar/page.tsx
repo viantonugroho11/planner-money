@@ -2,7 +2,7 @@
 import { useState, useMemo } from "react";
 import { useFinanceStore } from "@/store/finance-store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, formatCompact } from "@/lib/utils";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { format, getDaysInMonth, startOfMonth, getDay, isSameDay } from "date-fns";
 import { id as localeId } from "date-fns/locale";
@@ -103,8 +103,8 @@ export default function CashflowCalendarPage() {
                   <span className={`font-medium ${isToday ? "text-primary" : ""}`}>{day}</span>
                   {data && (
                     <>
-                      {data.income > 0 && <span className="text-green-400 leading-none" style={{ fontSize: "9px" }}>+{(data.income / 1000).toFixed(0)}k</span>}
-                      {data.expense > 0 && <span className="text-red-400 leading-none" style={{ fontSize: "9px" }}>-{(data.expense / 1000).toFixed(0)}k</span>}
+                      {data.income > 0 && <span className="text-green-400 leading-none" style={{ fontSize: "9px" }}>+{formatCompact(data.income)}</span>}
+                      {data.expense > 0 && <span className="text-red-400 leading-none" style={{ fontSize: "9px" }}>-{formatCompact(data.expense)}</span>}
                     </>
                   )}
                 </button>

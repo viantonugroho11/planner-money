@@ -37,3 +37,12 @@ export function endOfMonth(): number {
   const d = new Date();
   return new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59).getTime();
 }
+
+export function formatCompact(n: number): string {
+  const a = Math.abs(n);
+  const sign = n < 0 ? "-" : "";
+  if (a >= 1e9) return `${sign}${+(a / 1e9).toFixed(1)} M`;
+  if (a >= 1e6) return `${sign}${+(a / 1e6).toFixed(1)} jt`;
+  if (a >= 1e3) return `${sign}${+(a / 1e3).toFixed(0)} rb`;
+  return `${sign}${a}`;
+}

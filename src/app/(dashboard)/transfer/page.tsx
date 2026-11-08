@@ -8,7 +8,7 @@ import { ArrowRight, CheckCircle } from "lucide-react";
 const fmt = (n: number) => new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n);
 
 export default function TransferPage() {
-  const { wallets, addTransaction } = useFinanceStore();
+  const { wallets, categories, addCategory, addTransaction } = useFinanceStore();
   const [form, setForm] = useState({ fromWalletId: "", toWalletId: "", amount: "", note: "" });
   const [done, setDone] = useState(false);
 
@@ -18,10 +18,15 @@ export default function TransferPage() {
   async function submit() {
     if (!form.fromWalletId || !form.toWalletId || !form.amount || form.fromWalletId === form.toWalletId) return;
     const now = Date.now();
+    let transferCat = categories.find((c) => c.type === "transfer");
+    if (!transferCat) {
+      transferCat = { id: `transfer_${uuid().slice(0, 8)}`, name: "Transfer", icon: "🔁", color: "#6366f1", type: "transfer" };
+      await addCategory(transferCat);
+    }
     const tx: Transaction = {
       id: uuid(), type: "transfer", amount: Number(form.amount), currency: "IDR",
       walletId: form.fromWalletId, toWalletId: form.toWalletId,
-      categoryId: "transfer", note: form.note, date: now, createdAt: now, updatedAt: now,
+      categoryId: transferCat.id, note: form.note, date: now, createdAt: now, updatedAt: now,
     };
     await addTransaction(tx);
     setDone(true);
@@ -30,8 +35,8 @@ export default function TransferPage() {
   }
 
   return (
-    <div className="p-6 max-w-lg mx-auto space-y-6">
-      <h1 className="text-2xl font-bold">Transfer</h1>
+    <div className="p-4 md:p-6 max-w-lg mx-auto space-y-6">
+      <h1 className="text-xl font-semibold">Transfer</h1>
 
       {done && (
         <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-4 flex items-center gap-3">

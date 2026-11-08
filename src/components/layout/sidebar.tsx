@@ -9,7 +9,7 @@ const navGroups = [
   {
     label: "Utama",
     items: [
-      { href: "/", label: "Dashboard", icon: LayoutDashboard },
+      { href: "/", label: "Beranda", icon: LayoutDashboard },
       { href: "/transactions", label: "Transaksi", icon: ArrowLeftRight },
       { href: "/transfer", label: "Transfer", icon: Send },
       { href: "/wallets", label: "Dompet", icon: Wallet },

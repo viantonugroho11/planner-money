@@ -22,17 +22,17 @@ export default function NetWorthPage() {
 
   return (
     <div className="p-4 md:p-6 space-y-4">
-      <h1 className="text-xl font-semibold">Net Worth</h1>
+      <h1 className="text-xl font-semibold">Kekayaan Bersih</h1>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <Card>
-          <CardHeader><CardTitle>Assets</CardTitle></CardHeader>
+          <CardHeader><CardTitle>Aset</CardTitle></CardHeader>
           <CardContent>
             <p className="text-lg font-bold text-income">{formatCurrency(totalAssets)}</p>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader><CardTitle>Liabilities</CardTitle></CardHeader>
+          <CardHeader><CardTitle>Kewajiban</CardTitle></CardHeader>
           <CardContent>
             <p className="text-lg font-bold text-expense">{formatCurrency(totalLiabilities)}</p>
           </CardContent>

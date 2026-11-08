@@ -55,14 +55,14 @@ export default function BudgetsPage() {
     <div className="p-4 md:p-6 space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold">Budgets</h1>
+          <h1 className="text-xl font-semibold">Anggaran</h1>
           <p className="text-sm text-muted-foreground">
             {formatCurrency(totalSpent)} / {formatCurrency(totalBudget)} spent
           </p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button size="sm"><Plus className="h-4 w-4" /> Add Budget</Button>
+            <Button size="sm"><Plus className="h-4 w-4" /> Tambah anggaran</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
@@ -123,7 +123,7 @@ export default function BudgetsPage() {
       {budgets.length === 0 && (
         <Card>
           <CardContent className="py-12 text-center text-muted-foreground">
-            No budgets set. Add one to track your spending.
+            Belum ada anggaran. Buat satu untuk memantau pengeluaranmu.
           </CardContent>
         </Card>
       )}

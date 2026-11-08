@@ -63,10 +63,10 @@ export default function GoalsPage() {
   return (
     <div className="p-4 md:p-6 space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Goals</h1>
+        <h1 className="text-xl font-semibold">Tujuan</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button size="sm"><Plus className="h-4 w-4" /> Add Goal</Button>
+            <Button size="sm"><Plus className="h-4 w-4" /> Tambah tujuan</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
@@ -117,7 +117,7 @@ export default function GoalsPage() {
         <Card>
           <CardContent className="py-12 text-center text-muted-foreground">
             <Target className="h-10 w-10 mx-auto mb-3 opacity-30" />
-            <p>No goals yet. Add one to start saving!</p>
+            <p>Belum ada tujuan. Tambahkan satu untuk mulai menabung.</p>
           </CardContent>
         </Card>
       )}

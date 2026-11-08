@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { useFinanceStore } from "@/store/finance-store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { formatCurrency, formatDate, startOfMonth, endOfMonth } from "@/lib/utils";
+import { formatCurrency, formatCompact, formatDate, startOfMonth, endOfMonth } from "@/lib/utils";
 import { TrendingUp, TrendingDown, Wallet, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import {
@@ -64,7 +64,7 @@ export default function DashboardPage() {
   return (
     <div className="p-4 md:p-6 space-y-6">
       <div>
-        <h1 className="text-xl font-semibold">Dashboard</h1>
+        <h1 className="text-xl font-semibold">Beranda</h1>
         <p className="text-sm text-muted-foreground">
           {format(new Date(), "MMMM yyyy", { locale: localeId })}
         </p>
@@ -129,7 +129,7 @@ export default function DashboardPage() {
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#333" />
               <XAxis dataKey="label" tick={{ fontSize: 10, fill: "#888" }} interval={4} />
-              <YAxis tick={{ fontSize: 10, fill: "#888" }} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
+              <YAxis tick={{ fontSize: 10, fill: "#888" }} tickFormatter={(v) => formatCompact(v)} />
               <Tooltip
                 contentStyle={{ background: "#1a1a2e", border: "1px solid #333", borderRadius: "8px", fontSize: 12 }}
                 formatter={(v) => formatCurrency(Number(v))}

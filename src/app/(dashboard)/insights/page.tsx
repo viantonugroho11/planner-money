@@ -41,8 +41,8 @@ export default function InsightsPage() {
   }, [monthTx]);
 
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold">Insights</h1>
+    <div className="p-4 md:p-6 space-y-6">
+      <h1 className="text-xl font-semibold">Insights</h1>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[

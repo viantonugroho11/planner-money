@@ -31,9 +31,9 @@ export default function IouPage() {
   const totalBorrowed = active.filter((r) => r.direction === "borrowed").reduce((s, r) => s + r.remainingAmount, 0);
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 md:p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Hutang / Piutang</h1>
+        <h1 className="text-xl font-semibold">Hutang / Piutang</h1>
         <button onClick={() => setOpen(true)} className="flex items-center gap-2 bg-primary text-primary-foreground px-3 py-2 rounded-lg text-sm font-medium">
           <Plus className="h-4 w-4" /> Add
         </button>

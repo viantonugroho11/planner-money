@@ -37,9 +37,9 @@ export default function CategoriesPage() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 md:p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Categories</h1>
+        <h1 className="text-xl font-semibold">Kategori</h1>
         <button onClick={openNew} className="flex items-center gap-2 bg-primary text-primary-foreground px-3 py-2 rounded-lg text-sm font-medium">
           <Plus className="h-4 w-4" /> Add
         </button>
@@ -89,7 +89,7 @@ export default function CategoriesPage() {
         byType[type].length > 0 && (
           <div key={type} className="bg-card border border-border rounded-xl p-4">
             <h2 className="font-semibold capitalize mb-3">{type}</h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+            <div className="grid grid-cols-1 min-[420px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
               {byType[type].map((cat) => (
                 <div key={cat.id} className="flex items-center gap-2 p-2 rounded-lg bg-secondary/50 group">
                   <span className="text-xl">{cat.icon}</span>

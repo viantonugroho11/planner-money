@@ -29,8 +29,8 @@ export default function SalaryAllocatorPage() {
   const sal = Number(salary) || 0;
 
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold">Alokasi Gaji</h1>
+    <div className="p-4 md:p-6 space-y-6">
+      <h1 className="text-xl font-semibold">Alokasi Gaji</h1>
 
       <div className="bg-card border border-border rounded-xl p-4 space-y-3">
         <label className="text-xs text-muted-foreground">Gaji / Penghasilan (IDR)</label>
