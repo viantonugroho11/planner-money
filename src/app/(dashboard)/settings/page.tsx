@@ -91,11 +91,11 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="p-4 md:p-6 space-y-6 max-w-2xl">
+    <div className="p-4 md:p-6 space-y-6">
       <h1 className="text-xl font-semibold">Pengaturan</h1>
 
       {/* Quick Links */}
-      <div className="grid sm:grid-cols-2 gap-3">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {quickLinks.map(({ href, label, icon: Icon, desc }) => (
           <Link key={href} href={href}>
             <Card className="hover:bg-secondary/50 transition-colors cursor-pointer h-full">
@@ -109,6 +109,7 @@ export default function SettingsPage() {
         ))}
       </div>
 
+      <div className="grid lg:grid-cols-2 gap-6 items-start">
       {/* Account info & edit */}
       <Card>
         <CardHeader><CardTitle className="flex items-center gap-2"><User className="h-4 w-4" /> Profil Akun</CardTitle></CardHeader>
@@ -176,6 +177,7 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
+      <div className="space-y-6">
       {/* Data Summary */}
       <Card>
         <CardHeader><CardTitle className="flex items-center gap-2"><Database className="h-4 w-4" /> Ringkasan Data</CardTitle></CardHeader>
@@ -200,6 +202,8 @@ export default function SettingsPage() {
           <p className="text-xs">Built with Next.js 15, Supabase, Zustand, shadcn/ui</p>
         </CardContent>
       </Card>
+      </div>
+      </div>
     </div>
   );
 }

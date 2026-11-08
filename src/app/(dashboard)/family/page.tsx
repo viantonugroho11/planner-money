@@ -113,7 +113,7 @@ export default function FamilyPage() {
   if (loading) return <PageLoading />;
 
   return (
-    <div className="p-4 md:p-6 space-y-6 max-w-2xl">
+    <div className="p-4 md:p-6 space-y-6 max-w-3xl mx-auto">
       <div>
         <h1 className="text-xl font-semibold">Akun Keluarga</h1>
         <p className="text-sm text-muted-foreground">Undang anggota keluarga untuk berbagi keuangan</p>

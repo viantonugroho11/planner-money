@@ -8,7 +8,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <Sidebar />
       <main className="flex-1 flex flex-col min-w-0 pb-20 md:pb-0">
         <LoadErrorBanner />
-        {children}
+        <div className="w-full max-w-7xl mx-auto">{children}</div>
       </main>
       <MobileNav />
     </div>

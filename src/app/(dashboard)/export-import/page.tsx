@@ -86,7 +86,7 @@ export default function ExportImportPage() {
   ];
 
   return (
-    <div className="p-4 md:p-6 space-y-6 max-w-2xl">
+    <div className="p-4 md:p-6 space-y-6 max-w-3xl mx-auto">
       <h1 className="text-xl font-semibold">Export &amp; Import</h1>
 
       {/* Data summary */}
