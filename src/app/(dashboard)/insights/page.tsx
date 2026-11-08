@@ -47,10 +47,10 @@ export default function InsightsPage() {
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: "Income", value: fmt(income), color: "text-green-500" },
-          { label: "Expense", value: fmt(expense), color: "text-red-500" },
-          { label: "Savings", value: fmt(savings), color: savings >= 0 ? "text-blue-500" : "text-red-500" },
-          { label: "Savings Rate", value: `${savingsRate.toFixed(1)}%`, color: "text-purple-500" },
+          { label: "Pemasukan", value: fmt(income), color: "text-green-500" },
+          { label: "Pengeluaran", value: fmt(expense), color: "text-red-500" },
+          { label: "Tabungan", value: fmt(savings), color: savings >= 0 ? "text-blue-500" : "text-red-500" },
+          { label: "Rasio tabungan", value: `${savingsRate.toFixed(1)}%`, color: "text-purple-500" },
         ].map(({ label, value, color }) => (
           <div key={label} className="bg-card rounded-xl p-4 border border-border">
             <p className="text-xs text-muted-foreground">{label}</p>
