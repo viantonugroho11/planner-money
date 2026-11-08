@@ -208,10 +208,11 @@ export default function InvestmentsPage() {
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-sm">{inv.name}{inv.ticker ? ` (${inv.ticker})` : ""}</p>
                 <p className="text-xs text-muted-foreground">{inv.units} {inv.type === "gold" ? "gram" : inv.type === "stock" ? "lembar" : "unit"} · rata-rata {fmt(inv.avgPrice)}</p>
+                <p className="text-xs text-muted-foreground">sekarang {fmt(inv.currentPrice)}</p>
               </div>
               <div className="text-right">
                 <p className="font-semibold text-sm">{fmt(value)}</p>
-                <p className={`text-xs ${pnl >= 0 ? "text-green-500" : "text-red-500"}`}>{fmtPct(pnlPct)}</p>
+                <p className={`text-xs ${pnl >= 0 ? "text-green-500" : "text-red-500"}`}>{pnl >= 0 ? "+" : "-"}{fmt(Math.abs(pnl))} ({fmtPct(pnlPct)})</p>
               </div>
               <button onClick={() => removeInvestment(inv.id)}><Trash2 className="h-4 w-4 text-destructive" /></button>
             </div>
