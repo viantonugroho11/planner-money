@@ -70,3 +70,32 @@ alter table goals disable row level security;
 create index if not exists transactions_date_idx on transactions(date desc);
 create index if not exists transactions_wallet_id_idx on transactions(wallet_id);
 create index if not exists transactions_category_id_idx on transactions(category_id);
+
+-- ============================================================
+-- Households (family sharing) — RLS without recursion
+-- households policies may read household_members, but
+-- household_members policies must never read households directly.
+-- ============================================================
+CREATE OR REPLACE FUNCTION get_my_owned_household_ids()
+RETURNS SETOF uuid
+LANGUAGE sql SECURITY DEFINER STABLE SET search_path = public
+AS $$ SELECT id FROM households WHERE owner_id = auth.uid(); $$;
+
+DROP POLICY IF EXISTS households_owner_all ON households;
+DROP POLICY IF EXISTS households_member_read ON households;
+DROP POLICY IF EXISTS household_members_owner_manage ON household_members;
+DROP POLICY IF EXISTS household_members_self_read ON household_members;
+DROP POLICY IF EXISTS household_members_self_update ON household_members;
+
+CREATE POLICY households_owner_all ON households
+  FOR ALL USING (owner_id = auth.uid());
+CREATE POLICY households_member_read ON households
+  FOR SELECT USING (EXISTS (
+    SELECT 1 FROM household_members hm
+    WHERE hm.household_id = households.id AND hm.user_id = auth.uid() AND hm.status = 'active'));
+CREATE POLICY household_members_owner_manage ON household_members
+  FOR ALL USING (household_id IN (SELECT get_my_owned_household_ids()));
+CREATE POLICY household_members_self_read ON household_members
+  FOR SELECT USING (user_id = auth.uid() OR invited_email = (auth.jwt() ->> 'email'));
+CREATE POLICY household_members_self_update ON household_members
+  FOR UPDATE USING (user_id = auth.uid() OR invited_email = (auth.jwt() ->> 'email'));

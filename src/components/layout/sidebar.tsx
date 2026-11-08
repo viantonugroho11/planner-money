@@ -72,11 +72,11 @@ export function Sidebar() {
     <aside className="hidden md:flex flex-col w-60 min-h-screen bg-card border-r border-border p-4 gap-1">
       <div className="flex items-center gap-2 px-3 py-4 mb-4">
         <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm">
-          💰
+          <Wallet className="h-4 w-4" />
         </div>
         <div>
-          <p className="font-semibold text-sm">Finance AI</p>
-          <p className="text-xs text-muted-foreground">Journal</p>
+          <p className="font-semibold text-sm leading-tight">Finance AI</p>
+          <p className="text-xs text-muted-foreground">Jurnal keuangan</p>
         </div>
       </div>
 
@@ -90,10 +90,11 @@ export function Sidebar() {
                 <Link
                   key={href}
                   href={href}
+                  aria-current={active ? "page" : undefined}
                   className={cn(
-                    "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                    "relative flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                     active
-                      ? "bg-primary/15 text-primary"
+                      ? "nav-item-active nav-item-active-dot"
                       : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                   )}
                 >
@@ -109,17 +110,23 @@ export function Sidebar() {
       <div className="flex flex-col gap-1">
         <Link
           href="/settings"
-          className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+          aria-current={pathname === "/settings" ? "page" : undefined}
+          className={cn(
+            "relative flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+            pathname === "/settings"
+              ? "nav-item-active nav-item-active-dot"
+              : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+          )}
         >
           <Settings className="h-4 w-4" />
-          Settings
+          Pengaturan
         </Link>
         <button
           onClick={handleLogout}
           className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors w-full text-left"
         >
           <LogOut className="h-4 w-4" />
-          Logout
+          Keluar
         </button>
       </div>
     </aside>

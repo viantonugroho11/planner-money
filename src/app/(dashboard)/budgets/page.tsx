@@ -48,7 +48,7 @@ export default function BudgetsPage() {
   const totalBudget = budgets.reduce((s, b) => s + b.amount, 0);
   const totalSpent = budgets.reduce((s, b) => s + (spendMap.get(b.categoryId) ?? 0), 0);
 
-  if (!initialized) return <div className="p-6 text-muted-foreground animate-pulse">Loading...</div>;
+  if (!initialized) return <div className="p-6 text-muted-foreground animate-pulse">Memuat data…</div>;
 
   return (
     <div className="p-4 md:p-6 space-y-4">

@@ -71,7 +71,7 @@ export default function TravelPlannerPage() {
 
   const totalBalance = wallets.reduce((s, w) => s + w.balance, 0);
 
-  if (!initialized) return <div className="flex items-center justify-center h-screen"><div className="text-muted-foreground animate-pulse">Loading...</div></div>;
+  if (!initialized) return <div className="flex items-center justify-center h-screen"><div className="text-muted-foreground animate-pulse">Memuat data…</div></div>;
 
   return (
     <div className="p-4 md:p-6 space-y-6">

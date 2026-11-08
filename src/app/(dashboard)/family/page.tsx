@@ -63,7 +63,7 @@ export default function FamilyPage() {
       setMembers([]);
       setCreating(false);
       setHouseholdName("");
-      flash("Household dibuat!");
+      flash("Keluarga berhasil dibuat.");
     } catch (e) { setError((e as Error).message); }
   }
 
@@ -90,19 +90,19 @@ export default function FamilyPage() {
     try {
       await db.respondToInvite(inviteId, accept);
       setPendingInvites((prev) => prev.filter((i) => i.id !== inviteId));
-      flash(accept ? "Bergabung ke household!" : "Undangan ditolak.");
+      flash(accept ? "Kamu sudah bergabung ke keluarga." : "Undangan ditolak.");
       if (accept) load();
     } catch (e) { setError((e as Error).message); }
   }
 
   async function handleDeleteHousehold() {
     if (!myHousehold) return;
-    if (!confirm("Hapus household? Semua anggota akan dikeluarkan.")) return;
+    if (!confirm("Hapus keluarga ini? Semua anggota akan dikeluarkan dan ini tidak bisa dibatalkan.")) return;
     try {
       await db.deleteHousehold(myHousehold.id);
       setMyHousehold(null);
       setMembers([]);
-      flash("Household dihapus.");
+      flash("Keluarga dihapus.");
     } catch (e) { setError((e as Error).message); }
   }
 
@@ -111,7 +111,7 @@ export default function FamilyPage() {
 
   if (loading) return (
     <div className="flex items-center justify-center h-screen">
-      <div className="text-muted-foreground animate-pulse">Loading...</div>
+      <div className="text-muted-foreground animate-pulse">Memuat data…</div>
     </div>
   );
 
@@ -119,7 +119,7 @@ export default function FamilyPage() {
     <div className="p-4 md:p-6 space-y-6 max-w-2xl">
       <div>
         <h1 className="text-xl font-semibold">Akun Keluarga</h1>
-        <p className="text-sm text-muted-foreground">Kelola household dan bagikan akses keuangan bersama</p>
+        <p className="text-sm text-muted-foreground">Undang anggota keluarga untuk berbagi keuangan</p>
       </div>
 
       {error && (
@@ -170,7 +170,7 @@ export default function FamilyPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <p className="text-sm text-muted-foreground">Kamu anggota dari household ini.</p>
+            <p className="text-sm text-muted-foreground">Kamu anggota keluarga ini.</p>
             <div className="space-y-2">
               {activeMembers.map((m) => (
                 <div key={m.id} className="flex items-center gap-3 bg-secondary rounded-lg p-3">
@@ -253,7 +253,7 @@ export default function FamilyPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm truncate">{m.invitedEmail}</p>
-                      <p className="text-xs text-muted-foreground">Pending...</p>
+                      <p className="text-xs text-muted-foreground">Menunggu konfirmasi</p>
                     </div>
                     <Button variant="ghost" size="icon" onClick={() => handleRemoveMember(m.id)}>
                       <X className="h-3.5 w-3.5 text-muted-foreground" />
@@ -264,7 +264,7 @@ export default function FamilyPage() {
             )}
 
             {activeMembers.length === 0 && pendingMembers.length === 0 && (
-              <p className="text-sm text-muted-foreground text-center py-2">Belum ada anggota. Undang anggota keluarga!</p>
+              <p className="text-sm text-muted-foreground text-center py-2">Belum ada anggota. Masukkan email untuk mengundang.</p>
             )}
           </CardContent>
         </Card>
@@ -276,8 +276,8 @@ export default function FamilyPage() {
           <CardContent className="py-12 text-center space-y-4">
             <Users className="h-12 w-12 text-muted-foreground mx-auto" />
             <div>
-              <p className="font-medium">Belum punya household</p>
-              <p className="text-sm text-muted-foreground mt-1">Buat household dan undang anggota keluarga untuk kelola keuangan bersama</p>
+              <p className="font-medium">Belum ada keluarga</p>
+              <p className="text-sm text-muted-foreground mt-1">Buat keluarga, lalu undang pasangan atau anggota lain lewat email.</p>
             </div>
             {creating ? (
               <div className="flex gap-2 max-w-sm mx-auto">
@@ -285,7 +285,7 @@ export default function FamilyPage() {
                   value={householdName}
                   onChange={(e) => setHouseholdName(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleCreate()}
-                  placeholder="Nama household (mis. Keluarga Budi)"
+                  placeholder="Nama keluarga, mis. Keluarga Budi"
                   className="flex-1 px-3 py-2 bg-background border border-border rounded-lg text-sm"
                   autoFocus
                 />
@@ -294,7 +294,7 @@ export default function FamilyPage() {
               </div>
             ) : (
               <Button onClick={() => setCreating(true)}>
-                <Plus className="h-4 w-4 mr-2" /> Buat Household
+                <Plus className="h-4 w-4 mr-2" /> Buat keluarga
               </Button>
             )}
           </CardContent>

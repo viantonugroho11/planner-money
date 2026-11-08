@@ -61,7 +61,7 @@ export default function DashboardPage() {
   if (!initialized) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <div className="text-muted-foreground animate-pulse">Loading...</div>
+        <div className="text-muted-foreground animate-pulse">Memuat data…</div>
       </div>
     );
   }

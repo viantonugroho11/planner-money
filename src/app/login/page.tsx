@@ -49,13 +49,13 @@ export default function LoginPage() {
             <span className="text-3xl">💰</span>
           </div>
           <h1 className="text-2xl font-bold text-foreground">Finance AI Journal</h1>
-          <p className="text-muted-foreground text-sm mt-1">Personal finance tracker</p>
+          <p className="text-muted-foreground text-sm mt-1">Catat, atur, dan pahami keuanganmu</p>
         </div>
 
         {/* Card */}
         <div className="bg-card border border-border rounded-2xl p-6 shadow-lg">
           <h2 className="text-lg font-semibold mb-6">
-            {mode === "login" ? "Sign in" : "Create account"}
+            {mode === "login" ? "Masuk ke akunmu" : "Buat akun baru"}
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -68,21 +68,21 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                placeholder="you@example.com"
+                placeholder="nama@email.com"
                 className="w-full bg-background border border-border rounded-lg px-3 py-2.5 text-sm outline-none focus:border-primary transition-colors"
               />
             </div>
 
             <div>
               <label className="text-sm font-medium text-muted-foreground block mb-1.5">
-                Password
+                Kata sandi
               </label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                placeholder="••••••••"
+                placeholder="Minimal 6 karakter"
                 minLength={6}
                 className="w-full bg-background border border-border rounded-lg px-3 py-2.5 text-sm outline-none focus:border-primary transition-colors"
               />
@@ -104,17 +104,17 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full bg-primary text-primary-foreground font-medium rounded-lg py-2.5 text-sm hover:bg-primary/90 disabled:opacity-60 transition-colors"
             >
-              {loading ? "Loading..." : mode === "login" ? "Sign in" : "Sign up"}
+              {loading ? "Memproses…" : mode === "login" ? "Masuk" : "Daftar"}
             </button>
           </form>
 
           <p className="text-center text-sm text-muted-foreground mt-4">
-            {mode === "login" ? "No account?" : "Already have an account?"}{" "}
+            {mode === "login" ? "Belum punya akun?" : "Sudah punya akun?"}{" "}
             <button
               onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(""); setMessage(""); }}
               className="text-primary font-medium hover:underline"
             >
-              {mode === "login" ? "Sign up" : "Sign in"}
+              {mode === "login" ? "Daftar" : "Masuk"}
             </button>
           </p>
         </div>
