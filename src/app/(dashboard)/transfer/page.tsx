@@ -35,7 +35,7 @@ export default function TransferPage() {
   }
 
   return (
-    <div className="p-4 md:p-6 max-w-lg mx-auto space-y-6">
+    <div className="p-4 md:p-6 max-w-4xl mx-auto space-y-6">
       <h1 className="text-xl font-semibold">Transfer</h1>
 
       {done && (
@@ -45,6 +45,7 @@ export default function TransferPage() {
         </div>
       )}
 
+      <div className="grid md:grid-cols-[minmax(0,1fr)_20rem] gap-6 items-start">
       <div className="bg-card border border-border rounded-xl p-4 space-y-4">
         <div>
           <label className="text-xs text-muted-foreground">Dari Dompet</label>
@@ -80,17 +81,30 @@ export default function TransferPage() {
             className="w-full mt-1 px-3 py-2 bg-background border border-border rounded-lg text-sm" />
         </div>
 
-        {fromWallet && toWallet && form.amount && (
-          <div className="bg-secondary rounded-lg p-3 text-sm space-y-1">
-            <div className="flex justify-between"><span className="text-muted-foreground">{fromWallet.name}</span><span className="font-medium text-red-500">-{fmt(Number(form.amount))}</span></div>
-            <div className="flex justify-between"><span className="text-muted-foreground">{toWallet.name}</span><span className="font-medium text-green-500">+{fmt(Number(form.amount))}</span></div>
-          </div>
-        )}
-
         <button onClick={submit} disabled={!form.fromWalletId || !form.toWalletId || !form.amount}
           className="w-full bg-primary text-primary-foreground py-2 rounded-lg text-sm font-medium disabled:opacity-50">
           Transfer
         </button>
+      </div>
+
+      <div className="bg-card border border-border rounded-xl p-4 space-y-3 md:sticky md:top-6">
+        <h2 className="text-sm font-semibold">Ringkasan</h2>
+        {fromWallet && toWallet && Number(form.amount) > 0 ? (
+          <div className="space-y-3 text-sm">
+            <div>
+              <div className="flex justify-between"><span className="text-muted-foreground">{fromWallet.name}</span><span className="font-medium text-red-500">-{fmt(Number(form.amount))}</span></div>
+              <p className="text-xs text-muted-foreground mt-0.5">Sisa saldo {fmt(fromWallet.balance - Number(form.amount))}</p>
+            </div>
+            <div>
+              <div className="flex justify-between"><span className="text-muted-foreground">{toWallet.name}</span><span className="font-medium text-green-500">+{fmt(Number(form.amount))}</span></div>
+              <p className="text-xs text-muted-foreground mt-0.5">Saldo baru {fmt(toWallet.balance + Number(form.amount))}</p>
+            </div>
+            {fromWallet.balance < Number(form.amount) && <p className="text-xs text-destructive">Saldo {fromWallet.name} tidak cukup.</p>}
+          </div>
+        ) : (
+          <p className="text-sm text-muted-foreground">Pilih dompet asal, tujuan, dan jumlah untuk melihat saldo setelah transfer.</p>
+        )}
+      </div>
       </div>
     </div>
   );
