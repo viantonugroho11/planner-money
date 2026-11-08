@@ -39,6 +39,7 @@ export default function InsightsPage() {
     });
     return Object.entries(map).slice(-14);
   }, [monthTx]);
+  const maxDaily = Math.max(1, ...daily.flatMap(([, v]) => [v.income, v.expense]));
 
   return (
     <div className="p-4 md:p-6 space-y-6">
@@ -59,7 +60,7 @@ export default function InsightsPage() {
       </div>
 
       <div className="bg-card rounded-xl p-4 border border-border">
-        <h2 className="font-semibold mb-4">Top Expense Categories</h2>
+        <h2 className="font-semibold mb-4">Kategori pengeluaran terbesar</h2>
         {byCategory.length === 0 ? (
           <p className="text-muted-foreground text-sm">Belum ada pengeluaran bulan ini.</p>
         ) : (
@@ -89,27 +90,25 @@ export default function InsightsPage() {
       </div>
 
       <div className="bg-card rounded-xl p-4 border border-border">
-        <h2 className="font-semibold mb-4">Daily Cashflow (last 14 days)</h2>
+        <h2 className="font-semibold mb-4">Arus kas harian bulan ini</h2>
         {daily.length === 0 ? (
           <p className="text-muted-foreground text-sm">Belum ada transaksi.</p>
         ) : (
-          <div className="space-y-2">
+          <div className="divide-y divide-border">
             {daily.map(([date, { income: inc, expense: exp }]) => (
-              <div key={date} className="flex items-center gap-3 text-sm">
-                <span className="w-20 text-muted-foreground text-xs">{date}</span>
-                <div className="flex-1 flex gap-1">
-                  {inc > 0 && (
-                    <div className="h-4 rounded bg-green-500/70 text-white text-[10px] flex items-center px-1"
-                      style={{ width: `${Math.min(60, (inc / 5_000_000) * 100)}%`, minWidth: 30 }}>
-                      +{fmt(inc)}
-                    </div>
-                  )}
-                  {exp > 0 && (
-                    <div className="h-4 rounded bg-red-500/70 text-white text-[10px] flex items-center px-1"
-                      style={{ width: `${Math.min(60, (exp / 5_000_000) * 100)}%`, minWidth: 30 }}>
-                      -{fmt(exp)}
-                    </div>
-                  )}
+              <div key={date} className="grid grid-cols-[3.5rem_1fr_auto] sm:grid-cols-[4.5rem_1fr_11rem] items-center gap-3 py-2">
+                <span className="text-xs text-muted-foreground">{date}</span>
+                <div className="space-y-1">
+                  <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
+                    <div className="h-full rounded-full bg-green-500" style={{ width: `${(inc / maxDaily) * 100}%` }} />
+                  </div>
+                  <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
+                    <div className="h-full rounded-full bg-red-500" style={{ width: `${(exp / maxDaily) * 100}%` }} />
+                  </div>
+                </div>
+                <div className="text-right text-xs tabular-nums leading-snug">
+                  <p className={inc > 0 ? "text-green-500" : "text-muted-foreground/50"}>{inc > 0 ? `+${fmt(inc)}` : "—"}</p>
+                  <p className={exp > 0 ? "text-red-500" : "text-muted-foreground/50"}>{exp > 0 ? `-${fmt(exp)}` : "—"}</p>
                 </div>
               </div>
             ))}
