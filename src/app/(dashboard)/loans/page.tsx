@@ -84,9 +84,9 @@ export default function LoansPage() {
         </div>
       )}
 
-      <div className="space-y-3">
+      <div className="grid gap-3 lg:grid-cols-2 items-start">
         {loans.length === 0 ? (
-          <div className="bg-card border border-border rounded-xl p-8 text-center text-muted-foreground text-sm">Tidak ada pinjaman tercatat.</div>
+          <div className="col-span-full bg-card border border-border rounded-xl p-8 text-center text-muted-foreground text-sm">Tidak ada pinjaman tercatat.</div>
         ) : loans.map((loan) => {
           const monthly = calcMonthlyPayment(loan.principal, loan.annualInterestRate, loan.termMonths);
           const pct = loan.principal > 0 ? Math.max(0, 100 - (loan.remainingPrincipal / loan.principal) * 100) : 0;

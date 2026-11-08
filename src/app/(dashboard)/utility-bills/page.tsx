@@ -85,9 +85,9 @@ export default function UtilityBillsPage() {
         </div>
       )}
 
-      <div className="space-y-2">
+      <div className="grid gap-3 lg:grid-cols-2 items-start">
         {utilityBills.length === 0 ? (
-          <div className="bg-card border border-border rounded-xl p-8 text-center text-muted-foreground text-sm">Belum ada tagihan.</div>
+          <div className="col-span-full bg-card border border-border rounded-xl p-8 text-center text-muted-foreground text-sm">Belum ada tagihan.</div>
         ) : utilityBills.map((bill) => {
           const paid = isPaidThisMonth(bill);
           const overdue = !paid && today > bill.dueDay;

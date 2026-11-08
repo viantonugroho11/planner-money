@@ -79,9 +79,9 @@ export default function WishlistPage() {
         </div>
       )}
 
-      <div className="space-y-3">
+      <div className="grid gap-3 lg:grid-cols-2 items-start">
         {wishlistItems.length === 0 ? (
-          <div className="bg-card border border-border rounded-xl p-8 text-center text-muted-foreground text-sm">No wishlist items yet.</div>
+          <div className="col-span-full bg-card border border-border rounded-xl p-8 text-center text-muted-foreground text-sm">Belum ada item wishlist.</div>
         ) : wishlistItems.map((item) => {
           const pct = item.targetPrice > 0 ? Math.min(100, (item.savedAmount / item.targetPrice) * 100) : 0;
           return (

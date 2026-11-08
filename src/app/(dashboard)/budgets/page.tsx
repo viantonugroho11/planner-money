@@ -128,7 +128,7 @@ export default function BudgetsPage() {
         </Card>
       )}
 
-      <div className="space-y-3">
+      <div className="grid gap-3 lg:grid-cols-2 items-start">
         {budgets.map((budget) => {
           const cat = categories.find((c) => c.id === budget.categoryId);
           const spent = spendMap.get(budget.categoryId) ?? 0;

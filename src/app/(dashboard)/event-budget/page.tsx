@@ -85,9 +85,9 @@ export default function EventBudgetPage() {
         </div>
       )}
 
-      <div className="space-y-3">
+      <div className="grid gap-3 lg:grid-cols-2 items-start">
         {eventBudgets.length === 0 ? (
-          <div className="bg-card border border-border rounded-xl p-8 text-center text-muted-foreground text-sm">Belum ada event.</div>
+          <div className="col-span-full bg-card border border-border rounded-xl p-8 text-center text-muted-foreground text-sm">Belum ada event.</div>
         ) : eventBudgets.map((ev) => {
           const totalSpent = ev.items.reduce((s, i) => s + i.spent, 0);
           const pct = ev.totalBudget > 0 ? Math.min(100, (totalSpent / ev.totalBudget) * 100) : 0;

@@ -90,9 +90,9 @@ export default function RecurringPage() {
         </div>
       )}
 
-      <div className="space-y-2">
+      <div className="grid gap-3 lg:grid-cols-2 items-start">
         {recurring.length === 0 ? (
-          <div className="bg-card border border-border rounded-xl p-8 text-center text-muted-foreground text-sm">No recurring transactions yet.</div>
+          <div className="col-span-full bg-card border border-border rounded-xl p-8 text-center text-muted-foreground text-sm">Belum ada transaksi rutin.</div>
         ) : recurring.map((r) => {
           const cat = categories.find((c) => c.id === r.categoryId);
           const wallet = wallets.find((w) => w.id === r.walletId);

@@ -61,7 +61,7 @@ export default function InsightsPage() {
       <div className="bg-card rounded-xl p-4 border border-border">
         <h2 className="font-semibold mb-4">Top Expense Categories</h2>
         {byCategory.length === 0 ? (
-          <p className="text-muted-foreground text-sm">No expenses this month.</p>
+          <p className="text-muted-foreground text-sm">Belum ada pengeluaran bulan ini.</p>
         ) : (
           <div className="space-y-3">
             {byCategory.map(({ id, amount, cat }) => (
@@ -91,7 +91,7 @@ export default function InsightsPage() {
       <div className="bg-card rounded-xl p-4 border border-border">
         <h2 className="font-semibold mb-4">Daily Cashflow (last 14 days)</h2>
         {daily.length === 0 ? (
-          <p className="text-muted-foreground text-sm">No transactions yet.</p>
+          <p className="text-muted-foreground text-sm">Belum ada transaksi.</p>
         ) : (
           <div className="space-y-2">
             {daily.map(([date, { income: inc, expense: exp }]) => (

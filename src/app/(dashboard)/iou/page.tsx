@@ -85,8 +85,8 @@ export default function IouPage() {
         </div>
       )}
 
-      <div className="space-y-2">
-        {active.length === 0 && <div className="bg-card border border-border rounded-xl p-8 text-center text-muted-foreground text-sm">Tidak ada catatan aktif.</div>}
+      <div className="grid gap-3 lg:grid-cols-2 items-start">
+        {active.length === 0 && <div className="col-span-full bg-card border border-border rounded-xl p-8 text-center text-muted-foreground text-sm">Tidak ada catatan aktif.</div>}
         {active.map((r) => (
           <div key={r.id} className="bg-card border border-border rounded-xl p-4 flex items-center gap-3">
             <div className={`w-2 h-2 rounded-full ${r.direction === "lent" ? "bg-green-500" : "bg-red-500"}`} />

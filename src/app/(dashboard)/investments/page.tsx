@@ -101,9 +101,9 @@ export default function InvestmentsPage() {
         </div>
       )}
 
-      <div className="space-y-2">
+      <div className="grid gap-3 lg:grid-cols-2 items-start">
         {investments.length === 0 ? (
-          <div className="bg-card border border-border rounded-xl p-8 text-center text-muted-foreground text-sm">Belum ada investasi.</div>
+          <div className="col-span-full bg-card border border-border rounded-xl p-8 text-center text-muted-foreground text-sm">Belum ada investasi.</div>
         ) : investments.map((inv) => {
           const value = inv.units * inv.currentPrice;
           const cost = inv.units * inv.avgPrice;

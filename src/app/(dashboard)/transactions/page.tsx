@@ -236,7 +236,7 @@ export default function TransactionsPage() {
         {filtered.length === 0 && (
           <Card>
             <CardContent className="py-12 text-center text-muted-foreground">
-              No transactions found
+              Transaksi tidak ditemukan
             </CardContent>
           </Card>
         )}
